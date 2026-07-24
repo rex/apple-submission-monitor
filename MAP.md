@@ -1,64 +1,40 @@
-# MAP
-
-<!-- Repo map for humans and agents. Keep under 80 lines.
-     Update when you add a domain, a module, or a hot path. -->
+# Repository map
 
 ## Domains
 
-| Domain | Purpose | Entry point | Owner |
-|---|---|---|---|
-| <domain-a> | <what it does> | `<src>/<domain-a>/router.py` | @<owner> |
+| Domain | Purpose | Entry point |
+|---|---|---|
+| Process | Parse configuration and wire the application | `cmd/apple-submission-monitor/main.go` |
+| ASC adapter | Discover active reviews and decode status | `internal/asc/client.go` |
+| Domain | Persisted submission and health contracts | `internal/domain/submission.go` |
+| Monitor | Reconcile snapshots and user acknowledgment | `internal/monitor/engine.go` |
+| Configuration | Create and validate editable YAML | `internal/config/config.go` |
+| State | Atomically persist cards outside the repo | `internal/state/store.go` |
+| Speech | Render templates and invoke default-voice speech | `internal/speech/speaker.go` |
+| TUI | Adaptive layout, input, and animation | `internal/tui/` |
 
-## Extension points
+## External boundaries
 
-- <extension point 1> — <where to add new X>
-- <extension point 2> — <how to register a new Y>
+| System | Access | Failure behavior |
+|---|---|---|
+| `asc` | Direct child process with fixed arguments | Retain last snapshot and show sanitized warning |
+| `say` | Announcement text as the sole argument | Show non-fatal warning and continue |
+| `open` | Selected App Store Connect HTTPS link | Show non-fatal warning |
+| Local state | Versioned private JSON and YAML | Fail safely without leaking paths |
 
-## Where bodies are buried
+## Invariants
 
-<!-- The 3–5 weirdest things about this repo. Save the next agent 2 hours. -->
+- `asc` is the only App Store Connect data source.
+- Initial discovery includes only submitted, non-complete reviews.
+- A meaningful transition becomes unacknowledged and persists immediately.
+- Terminal cards survive upstream disappearance until acknowledged and removed.
+- Repository tests and examples contain synthetic data only.
 
-- (none yet)
+## Read order
 
-## Do not edit without ADR
-
-- <module or file> — <reason>
-
-## Hot paths (watch performance)
-
-- <path> — <latency target>
-
-## Cold paths (rarely touched)
-
-- <path> — <reason>
-
-## Cross-cutting concerns
-
-- Auth: <where it lives>
-- Logging: `<src>/logging.py`
-- Config: `<src>/config/settings.py`
-- Error handling: `<src>/main.py` (single exception handler)
-
-## External dependencies
-
-| System | What we call | When | Failure mode |
-|---|---|---|---|
-| <system-a> | <API/lib> | <what triggers it> | <behavior on outage> |
-
-## Quick tour (read order for a new contributor)
-
-1. `README.md` — human-readable entry point.
-2. `AGENTS.md` — agent-readable project contract.
-3. `CONVENTIONS.md` — how to write code here.
-4. This file — where things live.
-5. `specs/<active>/` — what's being built right now.
-6. `docs/adr/README.md` — why we made the decisions we made.
-
-## Agents: when to read what
-
-- Grep for symbols? Use Serena MCP, not raw grep.
-- Add a feature? Read `specs/<active>/spec.md` + `plan.md`, then the slice's
-  listed files.
-- Fix a bug? Read `TASK_STATE.md` for context, then the affected module's
-  `README.md`, then the code.
-- Refactor? Check `docs/adr/` for constraints before starting.
+1. `README.md`
+2. `AGENTS.md` and `CONVENTIONS.md`
+3. `specs/initial-monitor/spec.md`
+4. `internal/domain/submission.go`
+5. `internal/monitor/engine.go`
+6. `internal/tui/`

@@ -6,9 +6,9 @@
 
 ## Phase 2
 
-- [ ] S2.1 Implement typed `asc` discovery and status retrieval.
-- [ ] S2.2 Implement configuration, persistence, transitions, and speech.
-- [ ] S2.3 Add synthetic unit and fake-binary integration coverage.
+- [x] S2.1 Implement typed `asc` discovery and status retrieval.
+- [x] S2.2 Implement configuration, persistence, transitions, and speech.
+- [x] S2.3 Add synthetic unit and fake-binary integration coverage.
 
 ## Phase 3
 

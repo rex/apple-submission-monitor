@@ -26,6 +26,13 @@ version bumps).
 
 ---
 
+## [0.2.0] — 2026-07-24 — Agent: Codex
+### Added
+- Typed, bounded `asc` discovery and status retrieval with sanitized failures.
+- Atomic private state, configurable announcement templates, status transition
+  detection, acknowledgment, retained outcomes, and explicit removal.
+- Synthetic unit and fake-process integration coverage for the monitoring core.
+
 ## [0.1.0] — 2026-07-24 — Agent: Codex
 ### Added
 - Public-safe Go CLI scaffold with durable policy and quality gates.

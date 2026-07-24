@@ -29,8 +29,8 @@ committed.
 | # | Phase | Status | Exit criteria |
 |---|---|---|---|
 | 1 | Repository scaffold | ✅ done | Public-safe Go policy and gates committed |
-| 2 | Data and state engine | ⏸ pending | Active submissions poll reliably through asc |
-| 3 | Interactive TUI | ⏸ pending | Responsive cards, gradients, mouse, and animation work |
+| 2 | Data and state engine | ✅ done | Active submissions poll reliably through asc |
+| 3 | Interactive TUI | 🟡 in-prog | Responsive cards, gradients, mouse, and animation work |
 | 4 | Product hardening | ⏸ pending | Tests, docs, CI, and completion gates pass |
 
 Statuses: `⏸ pending` · `🟡 in-prog` · `✅ done` · `🔴 blocked`
@@ -51,7 +51,7 @@ Statuses: `⏸ pending` · `🟡 in-prog` · `✅ done` · `🔴 blocked`
 
 ### Slice 2.1 — Implement the monitor
 
-- Status: ⏸ pending
+- Status: ✅ done
 - Files (planned edits): `cmd/`, `internal/`, `config/`, tests, documentation
 
 ## 3. Blockers / open questions
@@ -66,9 +66,9 @@ Statuses: `⏸ pending` · `🟡 in-prog` · `✅ done` · `🔴 blocked`
 
 ## 5. Next actions (ordered)
 
-1. Commit the scaffold.
-2. Implement the asc adapter, monitor engine, persistence, and speech.
-3. Implement and verify the TUI.
+1. Implement and verify the TUI.
+2. Add CI, installation docs, and release packaging.
+3. Run the final completion gate and public-history audit.
 
 ## 6. Handoff note (fill when ending a session)
 
