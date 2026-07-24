@@ -6,7 +6,7 @@
 # Usage: make <target>
 # Run `make help` for a full list of available targets.
 
-.PHONY: help install install-cli env env-check setup validate update info \
+.PHONY: help install install-cli setup check-setup validate update info \
         dev build start lint typecheck check-architecture fix test coverage \
         check-public-safety check-docs security \
         bump-patch bump-minor bump-major check-version-bumped version \
@@ -43,9 +43,7 @@ help:
 	@echo "$(BOLD)Setup & Installation$(RESET)"
 	@echo "  $(GREEN)make install$(RESET)              Install dependencies"
 	@echo "  $(GREEN)make install-cli$(RESET)          Install the versioned binary"
-	@echo "  $(GREEN)make env$(RESET)                  Create .env from template"
-	@echo "  $(GREEN)make env-check$(RESET)            Verify required env vars"
-	@echo "  $(GREEN)make setup$(RESET)                Full setup: install + env + typecheck"
+	@echo "  $(GREEN)make setup$(RESET)                Full setup: install + typecheck"
 	@echo ""
 	@echo "$(BOLD)Development$(RESET)"
 	@echo "  $(GREEN)make dev$(RESET)                  Run the monitor from source"
@@ -93,33 +91,19 @@ install-cli: build
 	@install -m 0755 "bin/$(APP_NAME)" "$(INSTALL_DIR)/$(APP_NAME)"
 	@echo "$(GREEN)Installed $(INSTALL_DIR)/$(APP_NAME)$(RESET)"
 
-## env: Create .env from template if missing
-env:
-	@if [ ! -f .env ]; then \
-		if [ -f .env.example ]; then \
-			echo "$(YELLOW)Creating .env from .env.example...$(RESET)"; \
-			cp .env.example .env; \
-			echo "$(GREEN).env created. Configure before running.$(RESET)"; \
-		else \
-			echo "$(RED)No .env.example to copy from.$(RESET)"; exit 1; \
-		fi \
-	else \
-		echo "$(YELLOW).env already exists, skipping.$(RESET)"; \
-	fi
-
-## env-check: Verify required env vars are set
-env-check:
-	@if [ ! -f .env ]; then echo "$(RED).env missing — run `make env`.$(RESET)"; exit 1; fi
-	@echo "$(GREEN).env present.$(RESET)"
-
 ## setup: Full project setup
-setup: install env typecheck
+setup: install typecheck
 	@echo ""
 	@echo "$(GREEN)$(BOLD)Setup complete!$(RESET)"
 	@echo "  Run $(CYAN)make dev$(RESET) to start developing."
 
+## check-setup: Execute the public setup entrypoint as a regression test
+check-setup:
+	@$(MAKE) --no-print-directory setup >/dev/null
+	@echo "$(GREEN)Setup entrypoint passed.$(RESET)"
+
 ## validate: Run the repo's aggregate validation flow
-validate: lint typecheck test coverage check-architecture check-public-safety check-docs security check-version-bumped
+validate: lint typecheck test coverage check-architecture check-public-safety check-docs security check-setup check-version-bumped
 	@echo "$(GREEN)Validation complete.$(RESET)"
 
 # ─── Versioning (non-negotiable: every commit gets a bump) ───────────

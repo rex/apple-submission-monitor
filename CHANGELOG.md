@@ -29,6 +29,14 @@ version bumps).
 
 
 
+
+## [0.3.3] — 2026-07-24 — Agent: Codex
+### Fixed
+- Remove the unused `.env` scaffold from `make setup`, eliminating its shell
+  parse failure.
+- Execute the public setup entrypoint from the validation gate to prevent
+  onboarding regressions.
+
 ## [0.3.2] — 2026-07-24 — Agent: Codex
 ### Changed
 - Complete installation, controls, configuration, privacy, and long-session
