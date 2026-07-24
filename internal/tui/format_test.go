@@ -25,6 +25,7 @@ func TestTruncateAndPadBetween(t *testing.T) {
 
 	require.Equal(t, "abc…", truncate("abcdef", 4))
 	require.Equal(t, "one line", truncate("one\nline", 20))
+	require.Equal(t, "safe", truncate("sa\x1bfe", 20))
 	line := padBetween(
 		lipgloss.NewStyle().Foreground(lipgloss.Color("#FFFFFF")).Render("left"),
 		"right",

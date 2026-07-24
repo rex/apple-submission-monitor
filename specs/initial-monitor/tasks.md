@@ -18,12 +18,12 @@
 
 ## Phase 4
 
-- [ ] S4.1 Add CI, installation documentation, and example configuration.
-- [ ] S4.2 Pass all gates, sign and push commits, and verify the clean remote.
+- [x] S4.1 Add installation documentation, example configuration, and local validation.
+- [x] S4.2 Pass all gates, sign and push commits, and verify the clean remote.
 
 ## Done when
 
-- [ ] `make check-if-the-agent-can-consider-this-task-completed` passes.
-- [ ] The tree is clean, HEAD is signed, and the public remote is synchronized.
-- [ ] No personal information, secrets, machine identifiers, or live app data
+- [x] `make check-if-the-agent-can-consider-this-task-completed` passes.
+- [x] The tree is clean, HEAD is signed, and the public remote is synchronized.
+- [x] No personal information, secrets, machine identifiers, or live app data
   exists in repository content or history.

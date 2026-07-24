@@ -8,8 +8,9 @@ Wired into:
 
 Rules enforced:
   1. VERSION file exists and contains a semver string.
-  2. VERSION differs from HEAD's VERSION (unless HEAD doesn't exist —
-     bootstrap exemption for the first commit).
+  2. VERSION differs from HEAD's VERSION when work is pending (unless HEAD
+     doesn't exist — bootstrap exemption for the first commit). A clean,
+     already-committed tree validates the current release instead.
   3. CHANGELOG.md has a `## [<NEW_VERSION>] — ` header matching the
      current VERSION.
 
@@ -71,6 +72,17 @@ def head_version() -> str | None:
     return show.stdout.strip()
 
 
+def working_tree_has_changes() -> bool:
+    """Return whether non-ignored repository content differs from HEAD."""
+    result = subprocess.run(
+        ["git", "status", "--porcelain"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.returncode == 0 and bool(result.stdout.strip())
+
+
 def main() -> int:
     version_file = Path("VERSION")
     if not version_file.is_file():
@@ -81,7 +93,7 @@ def main() -> int:
         fail(f"VERSION is not semver: '{current}'", 3)
 
     prev = head_version()
-    if prev is not None and prev == current:
+    if prev is not None and prev == current and working_tree_has_changes():
         fail(
             f"VERSION unchanged ({current}). Bump before committing.\n"
             "    Run: make bump-patch | bump-minor | bump-major",

@@ -5,7 +5,7 @@ move through Apple's review process.
 
 ## Status
 
-🟡 Early development
+🟢 Usable beta · macOS-first · local-only
 
 ## Why this exists
 
@@ -14,7 +14,7 @@ makes status changes easy to miss. This tool uses the authenticated `asc` CLI
 as its only data source, keeps active submissions visible in evenly sized
 status-colored cards, and announces transitions with the macOS default voice.
 
-## Planned experience
+## What it does
 
 - Discover only apps with an active review submission.
 - Poll status through `asc status` and use `summary.health` for card colors.
@@ -23,15 +23,85 @@ status-colored cards, and announces transitions with the macOS default voice.
 - Retain completed submissions until acknowledgment and explicit removal.
 - Store editable announcement templates and runtime state outside the repo.
 
+## Quick start
+
+Prerequisites:
+
+- macOS
+- Go 1.24 or newer
+- [`asc`](https://github.com/rorkai/App-Store-Connect-CLI) 3.1 or newer,
+  authenticated with `asc auth status --validate`
+
+```bash
+git clone https://github.com/rex/apple-submission-monitor.git
+cd apple-submission-monitor
+make setup
+make build
+./bin/apple-submission-monitor
+```
+
+Install the versioned binary into the Go bin directory:
+
+```bash
+make install-cli
+apple-submission-monitor
+```
+
+The first launch creates a private local configuration file and shows its path
+in the footer. It never copies `asc` credentials.
+
+## Controls
+
+| Input | Action |
+|---|---|
+| Arrow keys or `h`/`j`/`k`/`l` | Select a card |
+| Click or `Enter`/`Space` | Acknowledge a changed card and stop its flashing |
+| `o` | Open the selected review in App Store Connect |
+| `D` or `Delete` | Remove an acknowledged terminal/retained card |
+| `r` | Refresh and discover now |
+| `?` | Toggle help |
+| `q` or `Ctrl-C` | Quit cleanly |
+
+## Configuration
+
+The generated YAML contains polling, timeout, animation, executable, and
+announcement settings. The committed
+[`config/config.example.yaml`](config/config.example.yaml) documents every
+field.
+
+```yaml
+announcements:
+  approved: "Great news. {{.AppName}} has been approved."
+  rejected: "Attention. {{.AppName}} was rejected. Its status is {{.NewStatus}}."
+  status_changed: "{{.AppName}} changed from {{.OldStatus}} to {{.NewStatus}}."
+```
+
+Available template fields are `.AppName`, `.OldStatus`, and `.NewStatus`.
+Announcements execute `say` with the rendered sentence as the only argument;
+the app never specifies a voice.
+
+CLI options:
+
+```text
+--config PATH   Use an explicit local YAML file
+--no-speech     Disable spoken announcements
+--version       Print the binary version
+```
+
+See [Operations](docs/OPERATIONS.md) for long-session behavior, persistence,
+failure recovery, and tuning.
+
 ## Architecture
 
 ```
 asc CLI → monitor engine → persisted snapshot → Bubble Tea dashboard
 ```
 
-- Go 1.24 or newer
-- `asc` 3.1 or newer, already authenticated
-- macOS for spoken announcements; the dashboard remains usable elsewhere
+- Full discovery runs less frequently than active-card polling and uses a
+  bounded worker pool.
+- Status changes compare a stable fingerprint, preventing metadata-only flashes.
+- State writes use private permissions and atomic replacement.
+- Terminal results remain until acknowledgment and explicit removal.
 
 ## Development
 
@@ -41,11 +111,16 @@ make dev
 make validate
 ```
 
-`VIBE.yaml` is the machine-readable repository policy. Testing is required;
-Docker and remote deployment are intentionally out of scope.
+`make validate` runs formatting/static analysis, race-enabled tests, coverage,
+architecture limits, the public-safety scan, module verification, reachable
+vulnerability analysis, and the version/changelog gate. `VIBE.yaml` is the
+machine-readable repository policy. Docker and remote deployment are
+intentionally out of scope. External CI is not coupled; `make validate` is the
+authoritative local completion gate.
 
 ## Privacy
 
 This is a public repository. Example data is synthetic. The program never
 stores credentials, and generated configuration, state, logs, app names, IDs,
-and other live `asc` output must never be committed.
+and other live `asc` output must never be committed. The safety gate also fails
+if a Go source file is accidentally hidden by `.gitignore`.

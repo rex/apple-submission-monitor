@@ -31,7 +31,7 @@ committed.
 | 1 | Repository scaffold | ✅ done | Public-safe Go policy and gates committed |
 | 2 | Data and state engine | ✅ done | Active submissions poll reliably through asc |
 | 3 | Interactive TUI | ✅ done | Responsive cards, gradients, mouse, and animation work |
-| 4 | Product hardening | 🟡 in-prog | Tests, docs, packaging, and completion gates pass |
+| 4 | Product hardening | ✅ done | Tests, docs, packaging, and completion gates pass |
 
 Statuses: `⏸ pending` · `🟡 in-prog` · `✅ done` · `🔴 blocked`
 
@@ -45,14 +45,23 @@ Statuses: `⏸ pending` · `🟡 in-prog` · `✅ done` · `🔴 blocked`
 - Files (do NOT edit): live asc authentication or runtime data
 - Depends on: none
 - Acceptance (EARS notation):
-  - [ ] Repository contains no personal or machine-specific information.
-  - [ ] Go build, lint, test, architecture, and public-safety gates are wired.
-  - [ ] Documentation records the confirmed product behavior.
+  - [x] Repository contains no personal or machine-specific information.
+  - [x] Go build, lint, test, architecture, and public-safety gates are wired.
+  - [x] Documentation records the confirmed product behavior.
 
 ### Slice 2.1 — Implement the monitor
 
 - Status: ✅ done
 - Files (planned edits): `cmd/`, `internal/`, `config/`, tests, documentation
+
+### Slice 4.1 — Harden and document the public release
+
+- Status: ✅ done
+- Files: `README.md`, `docs/OPERATIONS.md`, validation scripts, `Makefile`
+- Acceptance:
+  - [x] Installation, configuration, controls, and long-session operation are documented.
+  - [x] Reachable vulnerability and module-integrity checks pass.
+  - [x] Public history and tracked-source audits contain no private data.
 
 ## 3. Blockers / open questions
 
@@ -66,10 +75,9 @@ Statuses: `⏸ pending` · `🟡 in-prog` · `✅ done` · `🔴 blocked`
 
 ## 5. Next actions (ordered)
 
-1. Finish installation and operating documentation.
-2. Audit dependency security and public repository history.
-3. Run the final completion gate.
+1. None; initial release objective is complete.
 
 ## 6. Handoff note (fill when ending a session)
 
-Initial implementation is active.
+Version 0.3.2 is functional, live-smoke-tested, documented, and hardened.
+Resume from a new explicit objective.

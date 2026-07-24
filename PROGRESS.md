@@ -6,8 +6,8 @@
 - **Project**: apple-submission-monitor (Go CLI)
 - **Active branch**: `main`
 - **Active feature spec**: `specs/initial-monitor/`
-- **Active TASK_STATE**: `TASK_STATE.md` (Phase 1 / Slice 1.1)
-- **Last session**: 2026-07-24 (Codex, initial implementation)
+- **Active TASK_STATE**: `TASK_STATE.md` (Phase 4 complete)
+- **Last session**: 2026-07-24 (Codex, initial release completed)
 
 ## Last three decisions
 
@@ -24,7 +24,7 @@
 1. Read `AGENTS.md` then `TASK_STATE.md` §0 and current slice.
 2. Skim `specs/<slug>/plan.md` for the active phase.
 3. Do NOT re-plan if the plan is frozen — follow it.
-4. Run `make validate` to see current gate status.
+4. Run `make validate` to verify the repository.
 
 ## Do NOT
 

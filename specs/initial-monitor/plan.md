@@ -2,28 +2,28 @@
 
 ## Phase 1 — Public-safe scaffold
 
-- [ ] Configure Go module, quality gates, repository policy, and synthetic-only fixtures.
-- [ ] Record the local `asc` architecture decision.
+- [x] Configure Go module, quality gates, repository policy, and synthetic-only fixtures.
+- [x] Record the local `asc` architecture decision.
 
 ## Phase 2 — Monitoring engine
 
-- [ ] Add typed domain records and tolerant `asc` JSON decoders.
-- [ ] Discover apps, filter active submissions, and poll `asc status`.
-- [ ] Persist cards atomically outside the repository.
-- [ ] Detect transitions, retain terminal cards, and render announcement templates.
+- [x] Add typed domain records and tolerant `asc` JSON decoders.
+- [x] Discover apps, filter active submissions, and poll `asc status`.
+- [x] Persist cards atomically outside the repository.
+- [x] Detect transitions, retain terminal cards, and render announcement templates.
 
 ## Phase 3 — Terminal experience
 
-- [ ] Render an adaptive equal-cell grid with large gradient app names.
-- [ ] Use health colors for borders, badges, and animation.
-- [ ] Support mouse acknowledgment plus keyboard navigation, links, refresh, and removal.
-- [ ] Surface polling freshness, shortcuts, and sanitized degraded states.
+- [x] Render an adaptive equal-cell grid with large gradient app names.
+- [x] Use health colors for borders, badges, and animation.
+- [x] Support mouse acknowledgment plus keyboard navigation, links, refresh, and removal.
+- [x] Surface polling freshness, shortcuts, and sanitized degraded states.
 
 ## Phase 4 — Hardening
 
-- [ ] Cover unit and fake-binary integration scenarios.
-- [ ] Add CI, installation documentation, example configuration, and safety scanning.
-- [ ] Run the completion gate, sign commits, push, and verify the public remote.
+- [x] Cover unit and fake-binary integration scenarios.
+- [x] Add installation documentation, example configuration, and safety scanning.
+- [x] Run the completion gate, sign commits, push, and verify the public remote.
 
 ## Risks
 

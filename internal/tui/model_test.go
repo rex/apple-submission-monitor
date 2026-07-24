@@ -103,6 +103,7 @@ func TestViewFillsTerminalAndShowsFallbacks(t *testing.T) {
 
 	model.width = 20
 	require.Contains(t, model.View(), "Terminal too small")
+	require.Equal(t, "link", hyperlink("javascript:alert(1)", "link"))
 }
 
 func TestLifecycleMessagesRemainNonFatal(t *testing.T) {

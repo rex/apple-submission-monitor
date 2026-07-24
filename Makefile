@@ -6,9 +6,9 @@
 # Usage: make <target>
 # Run `make help` for a full list of available targets.
 
-.PHONY: help install env env-check setup validate update info \
+.PHONY: help install install-cli env env-check setup validate update info \
         dev build start lint typecheck check-architecture fix test coverage \
-        check-public-safety \
+        check-public-safety check-docs security \
         bump-patch bump-minor bump-major check-version-bumped version \
         clean clean-all \
         check-if-the-agent-can-consider-this-task-completed
@@ -20,7 +20,9 @@
 SHELL       := $(or $(wildcard /opt/homebrew/bin/zsh),$(shell command -v zsh))
 APP_NAME    ?= apple-submission-monitor
 GOLANGCI_VERSION ?= v2.12.2
+GOVULNCHECK_VERSION ?= v1.6.0
 COVERAGE_MINIMUM ?= 70
+INSTALL_DIR ?= $(shell go env GOPATH)/bin
 
 # Colors for output
 CYAN   := $(shell printf '\033[36m')
@@ -40,6 +42,7 @@ help:
 	@echo ""
 	@echo "$(BOLD)Setup & Installation$(RESET)"
 	@echo "  $(GREEN)make install$(RESET)              Install dependencies"
+	@echo "  $(GREEN)make install-cli$(RESET)          Install the versioned binary"
 	@echo "  $(GREEN)make env$(RESET)                  Create .env from template"
 	@echo "  $(GREEN)make env-check$(RESET)            Verify required env vars"
 	@echo "  $(GREEN)make setup$(RESET)                Full setup: install + env + typecheck"
@@ -55,6 +58,8 @@ help:
 	@echo "  $(GREEN)make test$(RESET)                 Run race-enabled tests"
 	@echo "  $(GREEN)make coverage$(RESET)             Enforce the coverage threshold"
 	@echo "  $(GREEN)make check-public-safety$(RESET)  Scan tracked files for private data"
+	@echo "  $(GREEN)make check-docs$(RESET)           Validate local Markdown links"
+	@echo "  $(GREEN)make security$(RESET)             Verify modules and reachable vulnerabilities"
 	@echo "  $(GREEN)make validate$(RESET)             Run every required quality gate"
 	@echo ""
 	@echo "$(BOLD)Versioning (required before every commit)$(RESET)"
@@ -82,6 +87,12 @@ install:
 	@go mod download
 	@echo "$(GREEN)Done.$(RESET)"
 
+## install-cli: Build and install the versioned binary into Go's bin directory
+install-cli: build
+	@mkdir -p "$(INSTALL_DIR)"
+	@install -m 0755 "bin/$(APP_NAME)" "$(INSTALL_DIR)/$(APP_NAME)"
+	@echo "$(GREEN)Installed $(INSTALL_DIR)/$(APP_NAME)$(RESET)"
+
 ## env: Create .env from template if missing
 env:
 	@if [ ! -f .env ]; then \
@@ -108,7 +119,7 @@ setup: install env typecheck
 	@echo "  Run $(CYAN)make dev$(RESET) to start developing."
 
 ## validate: Run the repo's aggregate validation flow
-validate: lint typecheck test coverage check-architecture check-public-safety check-version-bumped
+validate: lint typecheck test coverage check-architecture check-public-safety check-docs security check-version-bumped
 	@echo "$(GREEN)Validation complete.$(RESET)"
 
 # ─── Versioning (non-negotiable: every commit gets a bump) ───────────
@@ -191,6 +202,15 @@ coverage:
 ## check-public-safety: Scan tracked content for private or machine-specific data
 check-public-safety:
 	@scripts/check-public-safety.sh
+
+## check-docs: Validate local Markdown links
+check-docs:
+	@python3 scripts/check-doc-links.py
+
+## security: Verify modules and scan reachable code for known vulnerabilities
+security:
+	@go mod verify
+	@go run golang.org/x/vuln/cmd/govulncheck@$(GOVULNCHECK_VERSION) ./...
 
 # ─── Maintenance ──────────────────────────────────────────────────────
 

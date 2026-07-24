@@ -2,6 +2,7 @@ package tui
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -214,7 +215,11 @@ func (m Model) renderFooter() string {
 }
 
 func hyperlink(value string, label string) string {
-	if !strings.HasPrefix(value, "https://") {
+	parsed, err := url.ParseRequestURI(value)
+	if err != nil ||
+		parsed.Scheme != "https" ||
+		parsed.Host == "" ||
+		strings.ContainsAny(value, "\x1b\x07\r\n") {
 		return label
 	}
 	return "\x1b]8;;" + value + "\x07" + label + "\x1b]8;;\x07"

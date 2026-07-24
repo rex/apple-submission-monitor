@@ -28,6 +28,21 @@ version bumps).
 
 
 
+
+## [0.3.2] — 2026-07-24 — Agent: Codex
+### Changed
+- Complete installation, controls, configuration, privacy, and long-session
+  operating documentation.
+- Add local Markdown-link validation, module verification, and pinned
+  reachable-vulnerability scanning to the completion gate.
+- Add a versioned `make install-cli` workflow.
+### Security
+- Strip terminal control characters from metadata and validate HTTPS links
+  before emitting terminal hyperlink sequences.
+### Fixed
+- Let the final verification gate validate a clean committed release while
+  still requiring pending changes to bump their version.
+
 ## [0.3.1] — 2026-07-24 — Agent: Codex
 ### Fixed
 - Fix command-source packaging and ignored-source detection.
