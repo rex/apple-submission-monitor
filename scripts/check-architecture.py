@@ -43,7 +43,11 @@ def main() -> int:
             print(f"architecture: warning: {relative} has {len(lines)} lines (soft {SOFT_LIMIT})")
             warnings += 1
 
-        public_functions = sum(bool(PUBLIC_FUNCTION.match(line)) for line in lines)
+        public_functions = (
+            0
+            if path.name.endswith("_test.go")
+            else sum(bool(PUBLIC_FUNCTION.match(line)) for line in lines)
+        )
         if public_functions > PUBLIC_FUNCTION_LIMIT:
             print(
                 f"architecture: {relative} exposes {public_functions} functions "

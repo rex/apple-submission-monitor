@@ -26,6 +26,18 @@ version bumps).
 
 ---
 
+
+## [0.3.0] — 2026-07-24 — Agent: Codex
+### Added
+- Adaptive equal-cell Bubble Tea dashboard with health-colored cards, large
+  gradient app names, metadata, timing, and App Store Connect links.
+- Mouse and keyboard acknowledgment, shared pulse animation, manual refresh,
+  retained-outcome removal, and resilient long-lived polling.
+- Native CLI wiring, safe HTTPS opening, versioned builds, and TUI coverage.
+### Fixed
+- Version bump tooling now inserts entries after the changelog preamble instead
+  of modifying its fenced format example.
+
 ## [0.2.0] — 2026-07-24 — Agent: Codex
 ### Added
 - Typed, bounded `asc` discovery and status retrieval with sanitized failures.

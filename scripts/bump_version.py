@@ -9,8 +9,8 @@ Behavior:
        patch: X.Y.Z+1
   3. Writes the new VERSION.
   4. Inserts a new `## [X.Y.Z] — YYYY-MM-DD — Agent: <name>` header
-     above any existing `## [` block in CHANGELOG.md (creates CHANGELOG
-     if missing). If --changelog-note is given, places a matching bullet
+     after the changelog preamble or above the first version block (creates
+     CHANGELOG if missing). If --changelog-note is given, places a matching bullet
      under "### Changed" (or Fixed/Added/Removed if the note starts with
      a recognized keyword).
   5. Stages VERSION and CHANGELOG.md if a git repo is present.
@@ -111,14 +111,20 @@ def insert_changelog_block(changelog_path: Path, header: str, section: str, note
     block_lines.append("")
     block = "\n".join(block_lines) + "\n"
 
-    # Insert above the first existing `## [` line; append if none.
-    m = re.search(r"^## \[", text, re.MULTILINE)
-    if m:
-        text = text[: m.start()] + block + text[m.start() :]
+    # A maintained changelog uses `---` to separate its example preamble from
+    # real entries. Prefer that boundary so example `## [` text is untouched.
+    marker = re.search(r"^---\s*$", text, re.MULTILINE)
+    if marker:
+        insert_at = marker.end()
+        text = text[:insert_at] + "\n\n" + block + text[insert_at:].lstrip("\n")
     else:
-        if not text.endswith("\n"):
-            text += "\n"
-        text += "\n" + block
+        first_version = re.search(r"^## \[", text, re.MULTILINE)
+        if first_version:
+            text = text[: first_version.start()] + block + text[first_version.start() :]
+        else:
+            if not text.endswith("\n"):
+                text += "\n"
+            text += "\n" + block
 
     changelog_path.write_text(text)
 
@@ -140,8 +146,8 @@ def main() -> int:
     parser.add_argument("level", choices=["major", "minor", "patch"], help="bump level")
     parser.add_argument("--changelog-note", default="",
                         help="one-line description for the CHANGELOG bullet")
-    parser.add_argument("--agent", default=os.environ.get("AGENT_NAME", "Claude"),
-                        help="who's bumping (defaults to $AGENT_NAME or 'Claude')")
+    parser.add_argument("--agent", default=os.environ.get("AGENT_NAME", "Codex"),
+                        help="who's bumping (defaults to $AGENT_NAME or 'Codex')")
     args = parser.parse_args()
 
     version_file = Path("VERSION")

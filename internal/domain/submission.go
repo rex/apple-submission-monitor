@@ -82,7 +82,9 @@ func (s Submission) StatusLabel() string {
 
 // Terminal reports whether the submission has reached an outcome.
 func (s Submission) Terminal() bool {
-	if s.ReviewState == "COMPLETE" || !s.InFlight && s.Health == HealthGreen {
+	if s.ReviewState == "COMPLETE" ||
+		s.ReviewState == "UNRESOLVED_ISSUES" ||
+		!s.InFlight && s.Health == HealthGreen {
 		return true
 	}
 	state := strings.ToUpper(s.AppStoreState)

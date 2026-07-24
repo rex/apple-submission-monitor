@@ -147,7 +147,9 @@ dev:
 build:
 	@echo "$(CYAN)Building...$(RESET)"
 	@mkdir -p bin
-	@CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o bin/$(APP_NAME) ./cmd/apple-submission-monitor
+	@CGO_ENABLED=0 go build -trimpath \
+		-ldflags="-s -w -X main.version=$$(cat VERSION)" \
+		-o bin/$(APP_NAME) ./cmd/apple-submission-monitor
 
 ## start: Run the built binary
 start:

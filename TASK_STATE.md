@@ -30,8 +30,8 @@ committed.
 |---|---|---|---|
 | 1 | Repository scaffold | ✅ done | Public-safe Go policy and gates committed |
 | 2 | Data and state engine | ✅ done | Active submissions poll reliably through asc |
-| 3 | Interactive TUI | 🟡 in-prog | Responsive cards, gradients, mouse, and animation work |
-| 4 | Product hardening | ⏸ pending | Tests, docs, CI, and completion gates pass |
+| 3 | Interactive TUI | ✅ done | Responsive cards, gradients, mouse, and animation work |
+| 4 | Product hardening | 🟡 in-prog | Tests, docs, packaging, and completion gates pass |
 
 Statuses: `⏸ pending` · `🟡 in-prog` · `✅ done` · `🔴 blocked`
 
@@ -66,9 +66,9 @@ Statuses: `⏸ pending` · `🟡 in-prog` · `✅ done` · `🔴 blocked`
 
 ## 5. Next actions (ordered)
 
-1. Implement and verify the TUI.
-2. Add CI, installation docs, and release packaging.
-3. Run the final completion gate and public-history audit.
+1. Finish installation and operating documentation.
+2. Audit dependency security and public repository history.
+3. Run the final completion gate.
 
 ## 6. Handoff note (fill when ending a session)
 

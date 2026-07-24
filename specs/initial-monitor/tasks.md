@@ -12,9 +12,9 @@
 
 ## Phase 3
 
-- [ ] S3.1 Implement adaptive card layout and large gradient headings.
-- [ ] S3.2 Add mouse and keyboard acknowledgment, removal, links, and refresh.
-- [ ] S3.3 Verify resize, degraded, empty, and terminal-retention behavior.
+- [x] S3.1 Implement adaptive card layout and large gradient headings.
+- [x] S3.2 Add mouse and keyboard acknowledgment, removal, links, and refresh.
+- [x] S3.3 Verify resize, degraded, empty, and terminal-retention behavior.
 
 ## Phase 4
 
