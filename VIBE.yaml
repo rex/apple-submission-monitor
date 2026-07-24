@@ -1,0 +1,182 @@
+# VIBE.yaml — durable repo policy.
+#
+# Schema:    agentic-skeleton/references/vibe-yaml-schema.md
+# Defaults:  agentic-skeleton/templates/greenfield/vibe-defaults.yaml
+# Validator: scripts/validate_vibe_yaml.py  (hard-requires check-jsonschema)
+#
+# Edit this file when durable repo policy changes. Anything you OMIT is
+# hydrated from defaults — leave a key out only when "use the default" is
+# the right call. Set to `null` only as an explicit opt-out.
+#
+# Composable language and platform policies add
+# their own top-level keys via fragments — those go BELOW the skeleton
+# sections, one block per namespace.
+
+kind: vibe-policy
+schema_version: 1
+
+project:
+  name: apple-submission-monitor
+  # greenfield = new repo still scaffolding; brownfield = existing repo
+  lifecycle: greenfield
+  # Short stable id for the dominant stack (e.g. python-fastapi,
+  # nextjs-prisma, react-vite, node-cli). Composable skills key off this.
+  stack: go-cli
+
+  # Append-only decision log. Use IDs that survive across docs.
+  # Uncomment + edit the entry below when you record your first decision.
+  # Example shape:
+  #   decisions:
+  #     - id: D1
+  #       date: "2026-04-23"
+  #       decided_by: <author>
+  #       summary: <one-line decision>
+  #       rationale: <why this won't be obvious in 6 months>
+  #       status: locked   # locked | revisit | superseded
+  decisions:
+    - id: D1
+      date: "2026-07-24"
+      decided_by: project-owner
+      summary: Use Go with Bubble Tea and Lip Gloss
+      rationale: A native binary provides a responsive and durable long-running TUI.
+      status: locked
+    - id: D2
+      date: "2026-07-24"
+      decided_by: project-owner
+      summary: Keep the application local-only and public-safe
+      rationale: Runtime data stays outside the repository and all remote reads use asc.
+      status: locked
+
+workflow:
+  # interactive = ask before each non-trivial step (default)
+  # continue-until-blocked = run autonomously until hitting a stop condition
+  default_autonomy_mode: continue-until-blocked
+  default_slice_completion_behavior: commit-push-and-continue
+  allowed_stop_conditions:
+    - hard_blocker
+    - explicit_user_pause
+    - irreversible_user_decision_required
+    - missing_required_access
+  explicit_user_directives_override_skill_defaults: true
+  record_standing_user_directives_in_task_state: true
+  changelog_required: true
+  commit_per_logical_step: true
+  signed_commits_required: true
+  push_after_each_commit_if_remote_exists: true
+  validation_command: make validate
+  final_verification_command: make check-if-the-agent-can-consider-this-task-completed
+  # Set false for repos that already have a Dockerfile and are
+  # actively iterating on it.
+  ask_before_dockerizing: true
+
+quality_gates:
+  lint:
+    required: true
+    command: make lint
+  typecheck:
+    required: true
+    command: make typecheck
+  tests:
+    # required = active gate; deferred = intentionally not yet;
+    # not_applicable = work where tests don't apply (docs repos, etc.)
+    mode: required
+    command: make test
+    required_suites:
+      - unit
+      - integration
+    require_test_updates_for_all_code_changes: true
+    coverage:
+      enabled: true
+      command: make coverage
+      minimum_percentage: 70
+      measurement: line
+      enforcement_scope: overall
+  clean_worktree_required_on_completion: true
+
+architecture:
+  check_command: make check-architecture
+  scope_globs:
+    - "cmd/**/*.go"
+    - "internal/**/*.go"
+  exclude_globs:
+    - "**/*.generated.*"
+    - "**/node_modules/**"
+  max_lines_per_file:
+    soft: 250    # warning only — refactor trigger
+    hard: 400    # blocking failure
+
+docs:
+  agents_md_required: true
+  claude_md_required: true
+  task_state_required: true
+  vibe_yaml_required: true
+
+reporting:
+  intermediate_updates:
+    commentary_only_when_autonomous: true
+  completion_report:
+    required: true
+    heading: Completion Report
+    format: markdown-table
+    detail_level: compact
+    version_command: make version
+    include_fields:
+      - commit
+      - git_status
+      - version
+      - final_verification
+      - architecture
+      - lint
+      - typecheck
+      - tests
+      - coverage
+      - waivers
+    parse_counts_when_available: true
+    include_not_applicable_fields: true
+    omit_empty_fields: true
+    include_raw_output_when: failures-or-dirty
+    prefer_normalized_fields_over_raw_output: true
+
+security:
+  # forbidden = pre-commit hooks reject any committed secret.
+  # allowed-with-warning = only if the repo intentionally checks in
+  # encrypted secrets (SOPS / age / sealed-secrets).
+  secrets_in_files: forbidden
+  public_repository: true
+  prohibit_machine_identifiers: true
+  prohibit_live_app_fixtures: true
+
+versioning:
+  enabled: true
+  # semver | calver | none
+  style: semver
+  file: VERSION
+  initial: "0.1.0"
+  bump_required_per_commit: true
+  changelog_path: CHANGELOG.md
+  tag_prefix: "v"
+  tag_on_release: true
+
+deployment:
+  dockerized: false
+  autodeploy:
+    enabled: false
+    system: null
+    app_slug: null
+    stack_required: false
+    stack_repo_local_path: null
+    stack_path: null
+    runtime_changes_require_stack_update: false
+    require_commit_push_deploy_after_stack_change: false
+
+go:
+  go_version: "1.24"
+  http_framework: none
+  db_driver: none
+  logger: slog
+  test_framework: testify
+  linter:
+    tool: golangci-lint
+    version: "v2"
+  build_target: ""
+  cgo_enabled: false

@@ -1,0 +1,20 @@
+.DS_Store
+.env
+.env.local
+.idea/
+.vscode/
+bin/
+coverage.out
+coverage.html
+dist/
+*.log
+
+# Local agent and editor state
+.Codex/session-context.md
+.codex/session-context.md
+.serena/
+
+# Application runtime data; never commit live App Store data.
+config.yaml
+state.json
+apple-submission-monitor/
