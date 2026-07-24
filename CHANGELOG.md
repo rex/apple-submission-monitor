@@ -27,6 +27,11 @@ version bumps).
 ---
 
 
+
+## [0.3.1] — 2026-07-24 — Agent: Codex
+### Fixed
+- Fix command-source packaging and ignored-source detection.
+
 ## [0.3.0] — 2026-07-24 — Agent: Codex
 ### Added
 - Adaptive equal-cell Bubble Tea dashboard with health-colored cards, large

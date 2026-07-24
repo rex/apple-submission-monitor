@@ -30,4 +30,10 @@ if (( failed != 0 )); then
   exit 1
 fi
 
+ignored_go=$(git ls-files --others --ignored --exclude-standard -- "*.go")
+if [[ -n "$ignored_go" ]]; then
+  printf 'public-safety: Go source is hidden by .gitignore:\n%s\n' "$ignored_go" >&2
+  exit 1
+fi
+
 printf 'public-safety: no secrets, email addresses, or machine paths found\n'

@@ -15,6 +15,6 @@ dist/
 .serena/
 
 # Application runtime data; never commit live App Store data.
-config.yaml
-state.json
-apple-submission-monitor/
+/config.yaml
+/state.json
+/apple-submission-monitor/
