@@ -31,6 +31,19 @@ version bumps).
 
 
 
+
+## [0.4.0] — 2026-07-27 — Agent: Codex
+### Added
+- Render app names with large, filled FIGlet typography, multicolor animated
+  gradients, and a down-right dimensional shadow.
+- Give rejected or otherwise red-health cards a distorted poison-style banner
+  with deterministic blood drips.
+### Changed
+- Confine ambient motion to the banner glyphs so acknowledged waiting cards no
+  longer strobe their entire background.
+- Cache prepared FIGlet masks across animation frames for stable long-session
+  performance.
+
 ## [0.3.4] — 2026-07-27 — Agent: Codex
 ### Changed
 - Stack full-width review cards vertically and replace the block font with a

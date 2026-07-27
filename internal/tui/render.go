@@ -119,11 +119,9 @@ func (m Model) renderCard(card domain.Submission, area rect, selected bool) stri
 	if !card.Acknowledged && m.pulse {
 		borderColor = "#FFFFFF"
 		background = colors.flash
-	} else if card.Health == domain.HealthYellow && m.pulse {
-		background = colors.ambient
 	}
 
-	lines := m.cardLines(card, innerWidth, innerHeight, colors, m.pulse)
+	lines := m.cardLines(card, innerWidth, innerHeight, colors, m.animationFrame)
 	body := strings.Join(lines, "\n")
 	return lipgloss.NewStyle().
 		Width(innerWidth).
@@ -140,11 +138,11 @@ func (m Model) cardLines(
 	width int,
 	height int,
 	colors palette,
-	phase bool,
+	frame uint64,
 ) []string {
 	var lines []string
-	if height >= 12 && width >= 20 {
-		lines = append(lines, renderBanner(card.AppName, width, colors, phase)...)
+	if height >= 9 && width >= 20 {
+		lines = append(lines, m.renderCardBanner(card, width, height, colors, frame)...)
 	} else {
 		lines = append(lines, lipgloss.NewStyle().
 			Bold(true).

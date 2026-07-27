@@ -126,5 +126,5 @@ func (m Model) nextAnimationInterval() time.Duration {
 	if m.hasUnacknowledged() {
 		return m.animationInterval
 	}
-	return max(m.animationInterval, 1600*time.Millisecond)
+	return max(m.animationInterval/2, 120*time.Millisecond)
 }

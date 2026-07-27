@@ -26,7 +26,9 @@ footer. Both files and their directory use private permissions.
   non-complete reviews.
 - Polling cycles never overlap. Manual refresh waits for any local state action
   to finish.
-- A shared 400 ms animation timer runs only while a card is unacknowledged.
+- One shared low-frequency timer animates the FIGlet gradient while a waiting
+  card is visible. The configured interval controls the stronger flash used
+  only by unacknowledged changes.
 
 Tune the values in the generated YAML:
 
@@ -51,7 +53,7 @@ For each transition the app:
 
 1. Persists the new card immediately.
 2. Marks it unacknowledged.
-3. Starts the shared pulse animation.
+3. Starts the card-border/background pulse until acknowledgment.
 4. Renders the configured announcement.
 5. Executes `say` with only that sentence.
 

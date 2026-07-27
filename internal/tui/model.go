@@ -46,6 +46,7 @@ type Model struct {
 	help              bool
 	pulse             bool
 	animating         bool
+	animationFrame    uint64
 	notice            string
 	configPath        string
 	pollInterval      time.Duration
@@ -53,6 +54,19 @@ type Model struct {
 	animationInterval time.Duration
 	lastUpdated       time.Time
 	lastDiscovery     time.Time
+	bannerCache       map[string]cachedBanner
+}
+
+type bannerSpec struct {
+	name      string
+	health    domain.Health
+	width     int
+	maxHeight int
+}
+
+type cachedBanner struct {
+	spec bannerSpec
+	art  bannerArt
 }
 
 // New creates a fully wired TUI model.
@@ -73,6 +87,7 @@ func New(
 		pollInterval:      cfg.PollInterval,
 		discoveryInterval: cfg.DiscoveryInterval,
 		animationInterval: cfg.AnimationInterval,
+		bannerCache:       make(map[string]cachedBanner),
 	}
 }
 
@@ -89,6 +104,7 @@ func (m Model) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 	switch message := message.(type) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = message.Width, message.Height
+		m.rebuildBannerCache()
 	case tea.KeyMsg:
 		return m.handleKey(message)
 	case tea.MouseMsg:
@@ -119,6 +135,7 @@ func (m Model) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.cards = message.cards
 		m.clampSelection()
+		m.rebuildBannerCache()
 	case speechMsg:
 		if message.err != nil {
 			m.notice = "Speech announcement unavailable; monitoring continues."
@@ -142,6 +159,7 @@ func (m Model) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 			m.pulse = false
 			return m, nil
 		}
+		m.animationFrame++
 		m.pulse = !m.pulse
 		return m, animationTickCmd(m.nextAnimationInterval())
 	}
@@ -150,6 +168,7 @@ func (m Model) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) applyResult(result monitor.Result, bootstrap bool) (tea.Model, tea.Cmd) {
 	m.cards = result.Cards
+	m.rebuildBannerCache()
 	m.lastUpdated = time.Now()
 	if bootstrap {
 		m.lastDiscovery = m.lastUpdated
@@ -168,4 +187,41 @@ func (m Model) applyResult(result monitor.Result, bootstrap bool) (tea.Model, te
 		commands = append(commands, animationTickCmd(m.nextAnimationInterval()))
 	}
 	return m, tea.Batch(commands...)
+}
+
+func (m *Model) rebuildBannerCache() {
+	next := make(map[string]cachedBanner, len(m.cards))
+	if m.width <= 0 || m.height <= 0 {
+		m.bannerCache = next
+		return
+	}
+	layout := calculateGrid(m.width, m.height, len(m.cards))
+	for index, card := range m.cards {
+		area := layout.cell(index)
+		width := max(1, area.width-2)
+		height := max(1, area.height-2)
+		if width < 20 || height < 9 {
+			continue
+		}
+		spec := bannerSpec{
+			name:      card.AppName,
+			health:    card.Health,
+			width:     width,
+			maxHeight: max(1, height-5),
+		}
+		if cached, ok := m.bannerCache[card.Key()]; ok && cached.spec == spec {
+			next[card.Key()] = cached
+			continue
+		}
+		next[card.Key()] = cachedBanner{
+			spec: spec,
+			art: prepareBanner(
+				spec.name,
+				spec.width,
+				spec.maxHeight,
+				spec.health == domain.HealthRed,
+			),
+		}
+	}
+	m.bannerCache = next
 }

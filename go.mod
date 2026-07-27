@@ -5,6 +5,7 @@ go 1.24.0
 require (
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.0
+	github.com/lsferreira42/figlet-go v0.0.2-beta
 	github.com/mattn/go-runewidth v0.0.19
 	github.com/stretchr/testify v1.11.1
 	gopkg.in/yaml.v3 v3.0.1

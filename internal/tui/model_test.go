@@ -156,6 +156,22 @@ func TestWaitingCardsKeepAQuietAmbientAnimation(t *testing.T) {
 	require.NotNil(t, command)
 }
 
+func TestModelCachesPreparedBannersAcrossAnimationFrames(t *testing.T) {
+	t.Parallel()
+
+	model := testModel(&fakeMonitor{})
+	model.rebuildBannerCache()
+	cached, ok := model.bannerCache[model.cards[0].Key()]
+	require.True(t, ok)
+	require.NotEmpty(t, cached.art.figure)
+
+	before := cached.art.figure[0]
+	updatedModel, _ := model.Update(animationTickMsg(time.Now()))
+	updated := updatedModel.(Model)
+	require.Equal(t, before, updated.bannerCache[updated.cards[0].Key()].art.figure[0])
+	require.Equal(t, uint64(1), updated.animationFrame)
+}
+
 func TestManualRefreshAndHelp(t *testing.T) {
 	t.Parallel()
 

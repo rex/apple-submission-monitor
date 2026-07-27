@@ -7,15 +7,14 @@
 - **Active branch**: `main`
 - **Active feature spec**: `specs/initial-monitor/`
 - **Active TASK_STATE**: `TASK_STATE.md` (Phase 4 complete)
-- **Last session**: 2026-07-27 (Codex, vertical review-ledger visual refresh)
+- **Last session**: 2026-07-27 (Codex, animated FIGlet and rejection-art refresh)
 
 ## Last three decisions
 
-- 2026-07-24 Use Go with Bubble Tea and Lip Gloss.
 - 2026-07-24 Keep the application local-only and Docker-free.
 - 2026-07-24 Keep all runtime data outside the public repository.
-- 2026-07-27 Stack full-width review cards vertically; visually map waiting
-  status to a calm blue palette.
+- 2026-07-27 Use cached filled FIGlet banners with animated multicolor
+  gradients and a blood-dripping red-health treatment.
 
 ## Open blockers
 

@@ -79,6 +79,7 @@ Statuses: `⏸ pending` · `🟡 in-prog` · `✅ done` · `🔴 blocked`
 
 ## 6. Handoff note (fill when ending a session)
 
-Version 0.3.4 adds the vertical full-width review-ledger layout, a readable
-layered wordmark, status-age metadata, and a calm animated blue waiting state.
-Resume from a new explicit objective.
+Version 0.4.0 renders cached, filled FIGlet app names with animated multicolor
+gradients and dimensional shadows. Red-health cards use distorted blood-drip
+art; ambient motion stays inside the hero while status-change flashes still
+require acknowledgment. Resume from a new explicit objective.

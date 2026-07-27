@@ -1,47 +1,146 @@
 package tui
 
 import (
+	"math"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/mattn/go-runewidth"
+
+	"github.com/rex/apple-submission-monitor/internal/domain"
 )
 
-func renderBanner(name string, width int, colors palette, phase bool) []string {
-	wordmark := runewidth.Truncate(
-		strings.ToUpper(strings.TrimSpace(name)),
-		max(1, width-2),
-		"…",
-	)
-	face := gradientLine("◆ "+wordmark, colors, phase)
-	shadow := lipgloss.NewStyle().Foreground(lipgloss.Color(colors.shadow)).
-		Render("  " + wordmark)
-	ruleWidth := min(max(1, runewidth.StringWidth(wordmark)+1), max(1, width-2))
-	rule := lipgloss.NewStyle().Foreground(lipgloss.Color(colors.base)).
-		Render("╰" + strings.Repeat("─", ruleWidth) + "╯")
-	return []string{face, shadow, rule}
+type bannerArt struct {
+	figure   []string
+	bloody   bool
+	fallback string
 }
 
-func gradientLine(line string, colors palette, phase bool) string {
-	var rendered strings.Builder
-	characters := []rune(line)
-	for index, character := range characters {
-		if character == ' ' {
-			rendered.WriteRune(character)
-			continue
-		}
-		position := 0.0
-		if len(characters) > 1 {
-			position = float64(index) / float64(len(characters)-1)
-		}
-		if phase {
-			position = 1 - position
-		}
-		color := interpolateHex(colors.gradientA, colors.gradientB, position)
-		rendered.WriteString(lipgloss.NewStyle().
-			Foreground(lipgloss.Color(color)).
-			Bold(true).
-			Render(string(character)))
+func renderBanner(
+	name string,
+	width int,
+	maxHeight int,
+	colors palette,
+	frame uint64,
+	rejected bool,
+) []string {
+	return prepareBanner(name, width, maxHeight, rejected).render(width, colors, frame)
+}
+
+func (art bannerArt) render(width int, colors palette, frame uint64) []string {
+	if art.fallback != "" {
+		return []string{gradientLine(art.fallback, colors, frame)}
 	}
-	return rendered.String()
+	return colorizeFigure(art.figure, width, colors, frame, art.bloody)
+}
+
+func (m Model) renderCardBanner(
+	card domain.Submission,
+	width int,
+	height int,
+	colors palette,
+	frame uint64,
+) []string {
+	maxHeight := max(1, height-5)
+	cached, ok := m.bannerCache[card.Key()]
+	if ok && cached.spec == (bannerSpec{
+		name:      card.AppName,
+		health:    card.Health,
+		width:     width,
+		maxHeight: maxHeight,
+	}) {
+		return cached.art.render(width, colors, frame)
+	}
+	return renderBanner(
+		card.AppName,
+		width,
+		maxHeight,
+		colors,
+		frame,
+		card.Health == domain.HealthRed,
+	)
+}
+
+func colorizeFigure(
+	figure []string,
+	width int,
+	colors palette,
+	frame uint64,
+	bloody bool,
+) []string {
+	glyphs := newGradientGlyphs(colors)
+	shadow := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(colors.shadow)).
+		Bold(true).
+		Render("▓")
+	result := make([]string, len(figure))
+	for row, line := range figure {
+		var rendered strings.Builder
+		for column, character := range []rune(line) {
+			if character == ' ' {
+				rendered.WriteRune(character)
+				continue
+			}
+			position := gradientPosition(column, row, width, frame)
+			band := min(int(position*gradientBands), gradientBands-1)
+			if character == '▓' {
+				rendered.WriteString(shadow)
+				continue
+			}
+			switch {
+			case bloody && character == '│':
+				rendered.WriteString(glyphs.drip[band])
+			case bloody && character == '●':
+				rendered.WriteString(glyphs.drop[band])
+			default:
+				rendered.WriteString(glyphs.block[band])
+			}
+		}
+		result[row] = rendered.String()
+	}
+	return result
+}
+
+const gradientBands = 32
+
+type gradientGlyphs struct {
+	block [gradientBands]string
+	drip  [gradientBands]string
+	drop  [gradientBands]string
+}
+
+func newGradientGlyphs(colors palette) gradientGlyphs {
+	var glyphs gradientGlyphs
+	for index := range gradientBands {
+		position := float64(index) / float64(gradientBands-1)
+		style := lipgloss.NewStyle().
+			Foreground(lipgloss.Color(gradientColor(colors.gradient, position))).
+			Bold(true)
+		glyphs.block[index] = style.Render("█")
+		glyphs.drip[index] = style.Render("│")
+		glyphs.drop[index] = style.Render("●")
+	}
+	return glyphs
+}
+
+func gradientLine(line string, colors palette, frame uint64) string {
+	return colorizeFigure([]string{line}, max(1, runewidth.StringWidth(line)), colors, frame, true)[0]
+}
+
+func gradientPosition(column int, row int, width int, frame uint64) float64 {
+	travel := float64(frame%120) / 120
+	position := float64(column)/float64(max(1, width-1)) + float64(row)*0.035 + travel
+	return math.Mod(position, 1)
+}
+
+func gradientColor(stops []string, position float64) string {
+	if len(stops) == 0 {
+		return "#FFFFFF"
+	}
+	if len(stops) == 1 {
+		return stops[0]
+	}
+	scaled := position * float64(len(stops)-1)
+	index := min(int(scaled), len(stops)-2)
+	return interpolateHex(stops[index], stops[index+1], scaled-float64(index))
 }
