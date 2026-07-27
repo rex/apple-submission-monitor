@@ -27,6 +27,11 @@ review submissions. All remote data comes from the installed `asc` CLI.
   of repository files, fixtures, diagnostics, and command arguments.
 - The system shall color each card with the normalized `summary.health` value
   returned by `asc status`.
+- The system shall render total time since submission in the same large FIGlet
+  scale as the app name and classify it green through two days, yellow from two
+  to five days, and deteriorated blood-red at five days or later.
+- The system shall show App ID and trustworthy build, blocker, review-detail,
+  and in-flight checks retrieved through `asc`.
 
 ### Events
 
@@ -34,7 +39,8 @@ review submissions. All remote data comes from the installed `asc` CLI.
   configured announcement with `/usr/bin/say` and no voice flag, and animate
   the card until acknowledgment.
 - When an animated card is clicked or selected and acknowledged, the system
-  shall stop its animation and retain its stable health color.
+  shall stop its alert flashing and retain its stable health color while
+  ambient hero gradients continue.
 - When an acknowledged terminal card is removed, the system shall delete only
   that persisted card.
 

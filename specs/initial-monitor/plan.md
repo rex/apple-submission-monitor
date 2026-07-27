@@ -15,6 +15,8 @@
 ## Phase 3 — Terminal experience
 
 - [x] Render an adaptive equal-cell grid with large gradient app names.
+- [x] Pair app names with same-scale, age-classified submission-time heroes.
+- [x] Distribute App ID and ASC-derived health checks across wide metadata rails.
 - [x] Use health colors for borders, badges, and animation.
 - [x] Support mouse acknowledgment plus keyboard navigation, links, refresh, and removal.
 - [x] Surface polling freshness, shortcuts, and sanitized degraded states.
@@ -31,7 +33,7 @@
 |---|---|
 | `asc` aggregate JSON evolves | Decode only stable fields and tolerate unknown fields. |
 | Many apps create expensive scans | Limit concurrency and scan all apps less often than active polls. |
-| Terminal animation wastes resources | Use a low-frequency shared tick and animate only unacknowledged cards. |
+| Terminal animation wastes resources | Cache both FIGlet masks and recolor them on one low-frequency shared tick. |
 | Terminal submissions disappear upstream | Merge persisted cards before pruning and require explicit removal. |
 | Runtime data leaks into git | Store it in the user state directory with mode `0600` and scan candidates. |
 

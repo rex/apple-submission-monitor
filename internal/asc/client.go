@@ -76,6 +76,9 @@ func (c *Client) discoverApp(
 		if card.BundleID == "" {
 			card.BundleID = app.Attributes.BundleID
 		}
+		if diagnosticErr := c.enrichDiagnostics(ctx, &card); diagnosticErr != nil {
+			errs = append(errs, diagnosticErr)
+		}
 		cards = append(cards, card)
 	}
 	return cards, errors.Join(errs...)
@@ -127,6 +130,8 @@ func (c *Client) status(
 		LastSeenAt:    now,
 		LastChangedAt: now,
 		InFlight:      response.Submission.InFlight,
+		BlockerCount:  len(response.Summary.Blockers) + len(response.Submission.BlockingIssues),
+		BlockersKnown: true,
 	}
 	card.Retained = card.Terminal()
 	return card, nil

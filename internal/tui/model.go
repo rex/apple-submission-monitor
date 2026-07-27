@@ -62,11 +62,13 @@ type bannerSpec struct {
 	health    domain.Health
 	width     int
 	maxHeight int
+	ageText   string
+	ageBand   submissionAgeBand
 }
 
 type cachedBanner struct {
 	spec bannerSpec
-	art  bannerArt
+	art  heroArt
 }
 
 // New creates a fully wired TUI model.
@@ -196,6 +198,7 @@ func (m *Model) rebuildBannerCache() {
 		return
 	}
 	layout := calculateGrid(m.width, m.height, len(m.cards))
+	now := time.Now()
 	for index, card := range m.cards {
 		area := layout.cell(index)
 		width := max(1, area.width-2)
@@ -203,11 +206,14 @@ func (m *Model) rebuildBannerCache() {
 		if width < 20 || height < 9 {
 			continue
 		}
+		age := submissionAge(card, now)
 		spec := bannerSpec{
 			name:      card.AppName,
 			health:    card.Health,
 			width:     width,
-			maxHeight: max(1, height-5),
+			maxHeight: max(1, height-4),
+			ageText:   submissionAgeText(card, now),
+			ageBand:   classifySubmissionAge(age),
 		}
 		if cached, ok := m.bannerCache[card.Key()]; ok && cached.spec == spec {
 			next[card.Key()] = cached
@@ -215,11 +221,13 @@ func (m *Model) rebuildBannerCache() {
 		}
 		next[card.Key()] = cachedBanner{
 			spec: spec,
-			art: prepareBanner(
+			art: prepareHero(
 				spec.name,
+				spec.ageText,
 				spec.width,
 				spec.maxHeight,
 				spec.health == domain.HealthRed,
+				spec.ageBand,
 			),
 		}
 	}

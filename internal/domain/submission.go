@@ -46,6 +46,12 @@ type Submission struct {
 	LastSeenAt    time.Time `json:"last_seen_at"`
 	LastChangedAt time.Time `json:"last_changed_at"`
 	InFlight      bool      `json:"in_flight"`
+	BuildState    string    `json:"build_state,omitempty"`
+	BuildKnown    bool      `json:"build_known"`
+	BlockerCount  int       `json:"blocker_count"`
+	BlockersKnown bool      `json:"blockers_known"`
+	ReviewDetails bool      `json:"review_details"`
+	ReviewKnown   bool      `json:"review_known"`
 	Acknowledged  bool      `json:"acknowledged"`
 	Retained      bool      `json:"retained"`
 }
@@ -67,6 +73,11 @@ func (s Submission) Fingerprint() string {
 		s.NextAction,
 		fmt.Sprintf("%t", s.InFlight),
 	}, "\x1f")
+}
+
+// BuildValid reports whether asc confirmed the submitted build is valid.
+func (s Submission) BuildValid() bool {
+	return s.BuildKnown && strings.EqualFold(s.BuildState, "VALID")
 }
 
 // StatusLabel returns the most useful concise status for display and speech.

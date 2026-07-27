@@ -18,53 +18,60 @@ func prepareBanner(name string, width int, maxHeight int, rejected bool) bannerA
 	if len(figure) == 0 {
 		return bannerArt{fallback: truncate(strings.ToUpper(strings.TrimSpace(name)), width)}
 	}
-	if style.bloody {
-		figure = distortFigure(figure)
-		figure = appendBloodDrips(figure, width, name)
-		return bannerArt{figure: figure, bloody: true}
-	}
-	return bannerArt{figure: withShadow(figure)}
+	return styleFigure(figure, name, style.bloody)
 }
 
 func fittedFigure(name string, width int, maxHeight int, rejected bool) ([]string, bannerFont) {
-	fonts := []bannerFont{
-		{name: "banner3"},
-		{name: "doom"},
-		{name: "standard"},
-		{name: "smshadow"},
-		{name: "mini"},
+	for _, candidate := range candidateFonts(rejected) {
+		lines := renderFigure(name, candidate.name)
+		if len(lines) == 0 {
+			continue
+		}
+		styled := styleFigure(lines, name, candidate.bloody)
+		if figureFits(styled.figure, width, maxHeight) {
+			return lines, candidate
+		}
 	}
+	return nil, bannerFont{}
+}
+
+func candidateFonts(rejected bool) []bannerFont {
 	if rejected {
-		fonts = []bannerFont{
+		return []bannerFont{
 			{name: "poison", bloody: true},
 			{name: "sblood", bloody: true},
 			{name: "banner3", bloody: true},
 			{name: "mini", bloody: true},
 		}
 	}
-
-	cleanName := cleanFigureName(name)
-	for _, candidate := range fonts {
-		figure, err := figlet.Render(
-			cleanName,
-			figlet.WithFont(candidate.name),
-			figlet.WithWidth(1000),
-		)
-		if err != nil {
-			continue
-		}
-		lines := normalizeFigure(figure)
-		effectHeight := 1
-		effectWidth := 1
-		if candidate.bloody {
-			effectHeight = 3
-			effectWidth = 2
-		}
-		if figureFits(lines, width-effectWidth, maxHeight-effectHeight) {
-			return lines, candidate
-		}
+	return []bannerFont{
+		{name: "banner3"},
+		{name: "doom"},
+		{name: "standard"},
+		{name: "smshadow"},
+		{name: "mini"},
 	}
-	return nil, bannerFont{}
+}
+
+func renderFigure(value string, font string) []string {
+	figure, err := figlet.Render(
+		cleanFigureName(value),
+		figlet.WithFont(font),
+		figlet.WithWidth(1000),
+	)
+	if err != nil {
+		return nil
+	}
+	return normalizeFigure(figure)
+}
+
+func styleFigure(figure []string, seed string, bloody bool) bannerArt {
+	if bloody {
+		figure = distortFigure(figure)
+		figure = appendBloodDrips(figure, figureWidth(figure), seed)
+		return bannerArt{figure: figure, bloody: true}
+	}
+	return bannerArt{figure: withShadow(figure)}
 }
 
 func cleanFigureName(name string) string {

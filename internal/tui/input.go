@@ -111,15 +111,7 @@ func (m Model) hasUnacknowledged() bool {
 }
 
 func (m Model) shouldAnimate() bool {
-	if m.hasUnacknowledged() {
-		return true
-	}
-	for _, card := range m.cards {
-		if card.Health == domain.HealthYellow {
-			return true
-		}
-	}
-	return false
+	return len(m.cards) > 0
 }
 
 func (m Model) nextAnimationInterval() time.Duration {

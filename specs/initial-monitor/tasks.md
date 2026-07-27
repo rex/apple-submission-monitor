@@ -13,6 +13,7 @@
 ## Phase 3
 
 - [x] S3.1 Implement adaptive card layout and large gradient headings.
+- [x] S3.1a Add same-scale submission-age art and horizontal metadata checks.
 - [x] S3.2 Add mouse and keyboard acknowledgment, removal, links, and refresh.
 - [x] S3.3 Verify resize, degraded, empty, and terminal-retention behavior.
 

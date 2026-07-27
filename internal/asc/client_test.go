@@ -39,6 +39,12 @@ func (f *fakeRunner) Run(_ context.Context, args ...string) ([]byte, error) {
 		]}`), nil
 	case strings.HasPrefix(joined, "status --app app-alpha"):
 		return []byte(statusFixture), nil
+	case strings.HasPrefix(joined, "review status --app app-alpha"):
+		return []byte(`{"reviewDetailConfigured":true}`), nil
+	case strings.HasPrefix(joined, "versions view --version-id version-alpha"):
+		return []byte(`{"buildId":"build-alpha"}`), nil
+	case strings.HasPrefix(joined, "builds info --build-id build-alpha"):
+		return []byte(`{"data":{"attributes":{"processingState":"VALID"}}}`), nil
 	default:
 		return nil, errors.New("unexpected synthetic command")
 	}
@@ -60,6 +66,11 @@ func TestDiscoverFiltersNonSubmittedAndCompleteReviews(t *testing.T) {
 	require.Equal(t, "Synthetic Alpha", cards[0].AppName)
 	require.Equal(t, "1.2.3", cards[0].Version)
 	require.Equal(t, "yellow", string(cards[0].Health))
+	require.True(t, cards[0].BuildValid())
+	require.True(t, cards[0].ReviewKnown)
+	require.True(t, cards[0].ReviewDetails)
+	require.True(t, cards[0].BlockersKnown)
+	require.Zero(t, cards[0].BlockerCount)
 
 	runner.mu.Lock()
 	defer runner.mu.Unlock()
@@ -75,6 +86,21 @@ func TestDiscoverRejectsMalformedAppJSON(t *testing.T) {
 
 	_, err := client.Discover(context.Background())
 	require.ErrorContains(t, err, "decode asc apps list")
+}
+
+func TestRefreshPreservesDiscoveryDiagnostics(t *testing.T) {
+	t.Parallel()
+
+	client := NewClient(&fakeRunner{}, 1)
+	cards, err := client.Discover(context.Background())
+	require.NoError(t, err)
+
+	refreshed, err := client.Refresh(context.Background(), cards)
+	require.NoError(t, err)
+	require.Len(t, refreshed, 1)
+	require.True(t, refreshed[0].BuildValid())
+	require.True(t, refreshed[0].ReviewKnown)
+	require.True(t, refreshed[0].ReviewDetails)
 }
 
 type runnerFunc func(context.Context, ...string) ([]byte, error)
@@ -96,9 +122,9 @@ func hasPlatformFlag(calls [][]string, platform string) bool {
 
 const statusFixture = `{
   "app":{"id":"app-alpha","name":"Synthetic Alpha","bundleId":"test.example.alpha"},
-  "summary":{"health":"yellow","nextAction":"Wait for review."},
+  "summary":{"health":"yellow","nextAction":"Wait for review.","blockers":[]},
   "appstore":{"createdDate":"2026-01-01T01:02:03Z","platform":"IOS","state":"WAITING_FOR_REVIEW","version":"1.2.3","versionId":"version-alpha"},
-  "submission":{"inFlight":true},
+  "submission":{"inFlight":true,"blockingIssues":[]},
   "review":{"latestSubmissionId":"review-alpha","platform":"IOS","state":"WAITING_FOR_REVIEW","submittedDate":"2026-01-02T03:04:05Z"},
   "links":{"appStoreConnect":"https://example.test/apps/alpha","review":"https://example.test/reviews/alpha","testFlight":"https://example.test/testflight/alpha"}
 }`

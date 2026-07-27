@@ -144,48 +144,15 @@ func (m Model) cardLines(
 	if height >= 9 && width >= 20 {
 		lines = append(lines, m.renderCardBanner(card, width, height, colors, frame)...)
 	} else {
-		lines = append(lines, lipgloss.NewStyle().
+		name := lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color(colors.bright)).
-			Render(truncate(card.AppName, width)))
+			Render(truncate(card.AppName, max(1, width/2)))
+		age := submissionAgeText(card, time.Now())
+		lines = append(lines, padBetween(name, age, width))
 	}
 
-	now := time.Now()
-	lines = append(lines, renderStatusRail(card, width, colors, frame, now))
-
-	version := strings.TrimSpace(card.Version + " • " + card.Platform)
-	review := "Review: " + humanState(card.ReviewState)
-	if version == "" {
-		lines = append(lines, truncate(review, width))
-	} else {
-		version = truncate(version, max(1, width/3))
-		lines = append(lines, padBetween(
-			truncate(review, max(1, width-lipgloss.Width(version)-1)),
-			version,
-			width,
-		))
-	}
-
-	if !card.SubmittedAt.IsZero() {
-		lines = append(lines, truncate(
-			"Submitted: "+card.SubmittedAt.Local().Format("Jan 2, 3:04 PM")+
-				" • "+elapsed(card.SubmittedAt, now),
-			width,
-		))
-	}
-	if card.NextAction != "" {
-		lines = append(lines, truncate("Next: "+card.NextAction, width))
-	}
-	if card.BundleID != "" && len(lines) < height-2 {
-		lines = append(lines, truncate("Bundle: "+card.BundleID, width))
-	}
-	link := card.ReviewURL
-	if link == "" {
-		link = card.AppStoreURL
-	}
-	if link != "" && len(lines) < height-1 {
-		lines = append(lines, hyperlink(link, "↗ App Store Connect")+"  [o]")
-	}
+	lines = append(lines, metadataRails(card, width, colors)...)
 
 	alert := ""
 	switch {
@@ -232,15 +199,4 @@ func hyperlink(value string, label string) string {
 		return label
 	}
 	return "\x1b]8;;" + value + "\x07" + label + "\x1b]8;;\x07"
-}
-
-func humanState(value string) string {
-	if value == "" {
-		return "Unknown"
-	}
-	words := strings.Fields(strings.ReplaceAll(strings.ToLower(value), "_", " "))
-	for index := range words {
-		words[index] = strings.ToUpper(words[index][:1]) + words[index][1:]
-	}
-	return strings.Join(words, " ")
 }

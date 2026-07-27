@@ -51,5 +51,6 @@ acknowledges it and invokes removal.
 ## Performance
 
 Active polls default to 30 seconds. Full app discovery defaults to five minutes.
-Discovery workers are capped at four. A shared 400 ms animation tick runs only
-while at least one card is unacknowledged.
+Discovery workers are capped at four; submitted-build and review-detail checks
+run only during discovery. A shared 400 ms animation tick recolors cached hero
+masks, while only unacknowledged cards flash their border and background.

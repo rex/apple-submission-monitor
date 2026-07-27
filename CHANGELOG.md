@@ -33,6 +33,21 @@ version bumps).
 
 
 
+
+## [0.6.0] — 2026-07-27 — Agent: Codex
+### Added
+- Pair each app-name hero with an equally large, right-aligned total submission
+  age using a shared FIGlet font and independently animated gradient.
+- Classify submission age as green through 48 hours, gold until 120 hours, and
+  deteriorated blood-red from 120 hours onward.
+- Show App ID and ASC-derived submitted-build, blocker, review-detail, and
+  in-flight checks across bold full-width metadata rails.
+### Changed
+- Enrich diagnostic metadata only during five-minute discovery cycles while
+  preserving lightweight 30-second status polling.
+- Treat diagnostic refreshes as metadata so they never create false
+  status-change alerts or speech announcements.
+
 ## [0.5.0] — 2026-07-27 — Agent: Codex
 ### Added
 - Pin a live current-status timer to the far-right edge of every card's status

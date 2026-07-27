@@ -1,5 +1,7 @@
 package asc
 
+import "encoding/json"
+
 type appListResponse struct {
 	Data []appRecord `json:"data"`
 }
@@ -36,8 +38,9 @@ type statusResponse struct {
 		BundleID string `json:"bundleId"`
 	} `json:"app"`
 	Summary struct {
-		Health     string `json:"health"`
-		NextAction string `json:"nextAction"`
+		Health     string            `json:"health"`
+		NextAction string            `json:"nextAction"`
+		Blockers   []json.RawMessage `json:"blockers"`
 	} `json:"summary"`
 	AppStore struct {
 		CreatedDate string `json:"createdDate"`
@@ -47,7 +50,8 @@ type statusResponse struct {
 		VersionID   string `json:"versionId"`
 	} `json:"appstore"`
 	Submission struct {
-		InFlight bool `json:"inFlight"`
+		InFlight       bool              `json:"inFlight"`
+		BlockingIssues []json.RawMessage `json:"blockingIssues"`
 	} `json:"submission"`
 	Review struct {
 		LatestSubmissionID string `json:"latestSubmissionId"`
@@ -60,4 +64,20 @@ type statusResponse struct {
 		Review          string `json:"review"`
 		TestFlight      string `json:"testFlight"`
 	} `json:"links"`
+}
+
+type reviewStatusResponse struct {
+	ReviewDetailConfigured bool `json:"reviewDetailConfigured"`
+}
+
+type versionViewResponse struct {
+	BuildID string `json:"buildId"`
+}
+
+type buildInfoResponse struct {
+	Data struct {
+		Attributes struct {
+			ProcessingState string `json:"processingState"`
+		} `json:"attributes"`
+	} `json:"data"`
 }

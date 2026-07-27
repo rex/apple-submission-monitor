@@ -18,11 +18,13 @@ status-colored cards, and announces transitions with the macOS default voice.
 
 - Discover only apps with an active review submission.
 - Poll status through `asc status` and use `summary.health` for card colors.
-- Stack full-width review cards vertically, with large filled FIGlet app names,
-  dimensional shadows, and animated multicolor gradients.
+- Stack full-width review cards vertically, pairing each large filled FIGlet app
+  name with an equally large, right-aligned total submission age.
 - Distort red-health/rejected banners into a blood-dripping horror treatment.
-- Pin each card's time in its current status to the far-right status rail in a
-  separate animated mint, coral, and rose gradient.
+- Color the animated submission-age hero green through two days, gold from two
+  to five days, then deteriorated and blood-red from five days onward.
+- Distribute status, version, platform, App ID, bundle ID, timestamps, links,
+  and explicit build/blocker/review checks across three bold metadata rails.
 - Flash changed cards until they are clicked or selected and acknowledged.
 - Announce transitions via `/usr/bin/say` without selecting a voice.
 - Retain completed submissions until acknowledgment and explicit removal.
@@ -102,12 +104,12 @@ failure recovery, and tuning.
 asc CLI → monitor engine → persisted snapshot → Bubble Tea dashboard
 ```
 
-- Full discovery runs less frequently than active-card polling and uses a
-  bounded worker pool.
+- Full discovery runs less frequently than active-card polling, uses a bounded
+  worker pool, and enriches cards with submitted-build and review-detail checks.
 - Status changes compare a stable fingerprint, preventing metadata-only flashes.
-- Prepared FIGlet masks are cached; animation recolors the banner and
-  right-edge status age without rebuilding the font or strobing an
-  acknowledged card's background.
+- Prepared dual-hero FIGlet masks are cached; animation recolors the app name
+  and submission age without rebuilding fonts or strobing an acknowledged
+  card's background.
 - State writes use private permissions and atomic replacement.
 - Terminal results remain until acknowledgment and explicit removal.
 

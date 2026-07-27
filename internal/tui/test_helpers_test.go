@@ -82,6 +82,11 @@ func testModel(engine Monitor) Model {
 		SubmittedAt:   time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC),
 		LastChangedAt: time.Now().Add(-2 * time.Hour),
 		InFlight:      true,
+		BuildState:    "VALID",
+		BuildKnown:    true,
+		BlockersKnown: true,
+		ReviewDetails: true,
+		ReviewKnown:   true,
 		Acknowledged:  true,
 	}
 	cfg := config.Config{

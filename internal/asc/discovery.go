@@ -61,6 +61,10 @@ func (c *Client) Refresh(
 			defer group.Done()
 			for card := range jobs {
 				current, err := c.status(ctx, card.AppID, card.Platform, card.ID)
+				current.BuildState = card.BuildState
+				current.BuildKnown = card.BuildKnown
+				current.ReviewDetails = card.ReviewDetails
+				current.ReviewKnown = card.ReviewKnown
 				results <- refreshResult{card: current, err: err}
 			}
 		}()

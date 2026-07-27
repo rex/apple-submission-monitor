@@ -99,47 +99,12 @@ func TestViewFillsTerminalAndShowsFallbacks(t *testing.T) {
 	view := model.View()
 	require.Equal(t, model.height, lipgloss.Height(view))
 	require.Contains(t, view, "WAITING FOR REVIEW")
-	require.Contains(t, view, "App Store Connect")
+	require.Contains(t, view, "APP STORE CONNECT")
 	require.NotContains(t, view, "Status changed:")
 
 	model.width = 20
 	require.Contains(t, model.View(), "Terminal too small")
 	require.Equal(t, "link", hyperlink("javascript:alert(1)", "link"))
-}
-
-func TestStatusAgeUsesCurrentStatusAndSubmissionFallback(t *testing.T) {
-	t.Parallel()
-
-	now := time.Date(2026, 7, 27, 12, 0, 0, 0, time.UTC)
-	card := domain.Submission{
-		LastChangedAt: now.Add(-2*time.Hour - 5*time.Minute),
-		SubmittedAt:   now.Add(-8 * 24 * time.Hour),
-	}
-	require.Equal(t, "◷ IN STATUS · 2H 5M", statusAgeText(card, now, true))
-	require.Equal(t, "◷ 2H 5M", statusAgeText(card, now, false))
-
-	card.LastChangedAt = time.Time{}
-	require.Equal(t, "◷ IN REVIEW · 8D 0H", statusAgeText(card, now, true))
-
-	card.SubmittedAt = time.Time{}
-	require.Empty(t, statusAgeText(card, now, true))
-}
-
-func TestStatusRailKeepsAgeAtTheFarRight(t *testing.T) {
-	t.Parallel()
-
-	model := testModel(&fakeMonitor{})
-	card := model.cards[0]
-	rail := renderStatusRail(
-		card,
-		80,
-		healthPalette(card.Health),
-		12,
-		card.LastChangedAt.Add(2*time.Hour),
-	)
-	require.Equal(t, 80, lipgloss.Width(rail))
-	require.Contains(t, rail, "WAITING FOR REVIEW")
-	require.Contains(t, rail, "◷")
 }
 
 func TestLifecycleMessagesRemainNonFatal(t *testing.T) {
@@ -167,8 +132,7 @@ func TestLifecycleMessagesRemainNonFatal(t *testing.T) {
 	updated = updatedModel.(Model)
 	require.Contains(t, updated.notice, "open")
 
-	updated.cards[0].Acknowledged = true
-	updated.cards[0].Health = domain.HealthGray
+	updated.cards = nil
 	updated.animating = true
 	updatedModel, command := updated.Update(animationTickMsg(time.Now()))
 	updated = updatedModel.(Model)
@@ -198,12 +162,12 @@ func TestModelCachesPreparedBannersAcrossAnimationFrames(t *testing.T) {
 	model.rebuildBannerCache()
 	cached, ok := model.bannerCache[model.cards[0].Key()]
 	require.True(t, ok)
-	require.NotEmpty(t, cached.art.figure)
+	require.NotEmpty(t, cached.art.name.figure)
 
-	before := cached.art.figure[0]
+	before := cached.art.name.figure[0]
 	updatedModel, _ := model.Update(animationTickMsg(time.Now()))
 	updated := updatedModel.(Model)
-	require.Equal(t, before, updated.bannerCache[updated.cards[0].Key()].art.figure[0])
+	require.Equal(t, before, updated.bannerCache[updated.cards[0].Key()].art.name.figure[0])
 	require.Equal(t, uint64(1), updated.animationFrame)
 }
 

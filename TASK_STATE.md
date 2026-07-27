@@ -79,7 +79,8 @@ Statuses: `⏸ pending` · `🟡 in-prog` · `✅ done` · `🔴 blocked`
 
 ## 6. Handoff note (fill when ending a session)
 
-Version 0.5.0 adds a far-right current-status timer in an independently animated
-mint, coral, and rose gradient. Cached, filled FIGlet app names retain their
-multicolor dimensional or blood-drip treatments, and status-change flashes
-still require acknowledgment. Resume from a new explicit objective.
+Version 0.6.0 pairs every app-name hero with an equally large total submission
+age in a shared FIGlet font. Age art is green through 48 hours, gold until 120
+hours, then deteriorated and blood-red. Three bold metadata rails show App ID
+plus ASC-derived build, blocker, review-detail, and in-flight checks; diagnostic
+refreshes never trigger false transition alerts. Resume from a new objective.

@@ -7,15 +7,16 @@
 - **Active branch**: `main`
 - **Active feature spec**: `specs/initial-monitor/`
 - **Active TASK_STATE**: `TASK_STATE.md` (Phase 4 complete)
-- **Last session**: 2026-07-27 (Codex, right-edge current-status timer)
+- **Last session**: 2026-07-27 (Codex, dual giant hero and ASC check rails)
 
 ## Last three decisions
 
-- 2026-07-24 Keep all runtime data outside the public repository.
 - 2026-07-27 Use cached filled FIGlet banners with animated multicolor
   gradients and a blood-dripping red-health treatment.
-- 2026-07-27 Pin current-status age to the far-right status rail with a
-  contrasting animated gradient.
+- 2026-07-27 Use total submission age as a same-scale right-hand FIGlet hero,
+  with green, gold, and bleeding-red urgency bands.
+- 2026-07-27 Enrich wide metadata rails with App ID and truthful ASC checks only
+  during full discovery.
 
 ## Open blockers
 

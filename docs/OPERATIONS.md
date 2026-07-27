@@ -22,14 +22,16 @@ footer. Both files and their directory use private permissions.
 - Active cards refresh every 30 seconds by default.
 - Full app discovery runs every five minutes by default.
 - A full discovery lists apps through `asc`, checks each app's review
-  submissions with bounded concurrency, and renders only submitted,
+  submissions with bounded concurrency, resolves the submitted build's validity
+  and review-detail configuration through `asc`, and renders only submitted,
   non-complete reviews.
 - Polling cycles never overlap. Manual refresh waits for any local state action
   to finish.
-- One shared low-frequency timer animates the FIGlet gradient and the
-  independently colored status-age rail while a waiting card is visible. The
-  configured interval controls the stronger flash used only by unacknowledged
-  changes.
+- One shared low-frequency timer animates both cached FIGlet heroes while cards
+  are visible. The configured interval also controls the stronger
+  border/background flash used only by unacknowledged changes.
+- Submission age is calculated from Apple's submitted date. It remains green
+  through 48 hours, gold until 120 hours, and blood-red at 120 hours and beyond.
 
 Tune the values in the generated YAML:
 

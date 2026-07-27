@@ -58,6 +58,14 @@ func TestNormalizeHealth(t *testing.T) {
 	require.Equal(t, domain.HealthGray, domain.NormalizeHealth("chartreuse"))
 }
 
+func TestBuildValidRequiresKnownValidState(t *testing.T) {
+	t.Parallel()
+
+	require.False(t, (domain.Submission{BuildState: "VALID"}).BuildValid())
+	require.False(t, (domain.Submission{BuildKnown: true, BuildState: "PROCESSING"}).BuildValid())
+	require.True(t, (domain.Submission{BuildKnown: true, BuildState: "valid"}).BuildValid())
+}
+
 func TestFingerprintIgnoresMetadataRefresh(t *testing.T) {
 	t.Parallel()
 
@@ -70,6 +78,11 @@ func TestFingerprintIgnoresMetadataRefresh(t *testing.T) {
 	after := before
 	after.AppName = "Synthetic Alpha"
 	after.Version = "2.0"
+	after.BuildKnown = true
+	after.BuildState = "VALID"
+	after.BlockersKnown = true
+	after.ReviewKnown = true
+	after.ReviewDetails = true
 
 	require.Equal(t, before.Fingerprint(), after.Fingerprint())
 }

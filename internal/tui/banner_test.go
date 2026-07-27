@@ -53,21 +53,6 @@ func TestBannerGradientPositionMovesBetweenFrames(t *testing.T) {
 	first := gradientPosition(25, 2, 100, 0)
 	second := gradientPosition(25, 2, 100, 1)
 	require.NotEqual(t, first, second)
-
-	statusFirst := statusAgeGradientPosition(25, 100, 0)
-	statusSecond := statusAgeGradientPosition(25, 100, 1)
-	require.NotEqual(t, statusFirst, statusSecond)
-	require.NotEqual(t, first, statusFirst)
-}
-
-func TestGradientTextPreservesContentAndWidth(t *testing.T) {
-	t.Parallel()
-
-	const text = "◷ IN STATUS · 2H 5M"
-	rendered := gradientText(text, statusAgeColors(), 12)
-	require.Equal(t, lipgloss.Width(text), lipgloss.Width(rendered))
-	require.Contains(t, rendered, "◷")
-	require.Contains(t, rendered, "2")
 }
 
 func TestInterpolateHex(t *testing.T) {
@@ -83,5 +68,15 @@ func BenchmarkRenderPreparedBanner(b *testing.B) {
 	b.ResetTimer()
 	for b.Loop() {
 		art.render(156, colors, 12)
+	}
+}
+
+func BenchmarkRenderPreparedHero(b *testing.B) {
+	nameColors := healthPalette(domain.HealthYellow)
+	ageColors := submissionAgePalette(ageBandRed)
+	art := prepareHero("Synthetic Alpha", "8D 17H", 156, 18, false, ageBandRed)
+	b.ResetTimer()
+	for b.Loop() {
+		art.render(156, nameColors, ageColors, 12)
 	}
 }
