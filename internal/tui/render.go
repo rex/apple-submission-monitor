@@ -150,21 +150,26 @@ func (m Model) cardLines(
 			Render(truncate(card.AppName, width)))
 	}
 
-	badge := lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color(colors.base)).
-		Render("● " + strings.ToUpper(card.StatusLabel()))
+	now := time.Now()
+	lines = append(lines, renderStatusRail(card, width, colors, frame, now))
+
 	version := strings.TrimSpace(card.Version + " • " + card.Platform)
-	lines = append(lines, padBetween(badge, truncate(version, width/2), width))
-	lines = append(lines, truncate("Review: "+humanState(card.ReviewState), width))
-	if !card.LastChangedAt.IsZero() {
-		lines = append(lines, truncate(statusChangedAt(card.LastChangedAt, time.Now()), width))
+	review := "Review: " + humanState(card.ReviewState)
+	if version == "" {
+		lines = append(lines, truncate(review, width))
+	} else {
+		version = truncate(version, max(1, width/3))
+		lines = append(lines, padBetween(
+			truncate(review, max(1, width-lipgloss.Width(version)-1)),
+			version,
+			width,
+		))
 	}
 
 	if !card.SubmittedAt.IsZero() {
 		lines = append(lines, truncate(
 			"Submitted: "+card.SubmittedAt.Local().Format("Jan 2, 3:04 PM")+
-				" • "+elapsed(card.SubmittedAt, time.Now()),
+				" • "+elapsed(card.SubmittedAt, now),
 			width,
 		))
 	}

@@ -18,8 +18,6 @@ func TestElapsedFormatsUsefulRanges(t *testing.T) {
 	require.Equal(t, "2h 5m", elapsed(now.Add(-2*time.Hour-5*time.Minute), now))
 	require.Equal(t, "2d 3h", elapsed(now.Add(-51*time.Hour), now))
 	require.Equal(t, "just now", elapsed(now.Add(time.Minute), now))
-	require.Equal(t, "Status changed: 2h 5m ago", statusChangedAt(now.Add(-2*time.Hour-5*time.Minute), now))
-	require.Equal(t, "Status changed: just now", statusChangedAt(now.Add(-30*time.Second), now))
 }
 
 func TestTruncateAndPadBetween(t *testing.T) {

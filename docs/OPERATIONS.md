@@ -26,9 +26,10 @@ footer. Both files and their directory use private permissions.
   non-complete reviews.
 - Polling cycles never overlap. Manual refresh waits for any local state action
   to finish.
-- One shared low-frequency timer animates the FIGlet gradient while a waiting
-  card is visible. The configured interval controls the stronger flash used
-  only by unacknowledged changes.
+- One shared low-frequency timer animates the FIGlet gradient and the
+  independently colored status-age rail while a waiting card is visible. The
+  configured interval controls the stronger flash used only by unacknowledged
+  changes.
 
 Tune the values in the generated YAML:
 

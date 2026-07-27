@@ -21,7 +21,8 @@ status-colored cards, and announces transitions with the macOS default voice.
 - Stack full-width review cards vertically, with large filled FIGlet app names,
   dimensional shadows, and animated multicolor gradients.
 - Distort red-health/rejected banners into a blood-dripping horror treatment.
-- Show the elapsed time since each card's last meaningful status change.
+- Pin each card's time in its current status to the far-right status rail in a
+  separate animated mint, coral, and rose gradient.
 - Flash changed cards until they are clicked or selected and acknowledged.
 - Announce transitions via `/usr/bin/say` without selecting a voice.
 - Retain completed submissions until acknowledgment and explicit removal.
@@ -104,8 +105,9 @@ asc CLI → monitor engine → persisted snapshot → Bubble Tea dashboard
 - Full discovery runs less frequently than active-card polling and uses a
   bounded worker pool.
 - Status changes compare a stable fingerprint, preventing metadata-only flashes.
-- Prepared FIGlet masks are cached; animation recolors the banner without
-  rebuilding the font or strobing an acknowledged card's background.
+- Prepared FIGlet masks are cached; animation recolors the banner and
+  right-edge status age without rebuilding the font or strobing an
+  acknowledged card's background.
 - State writes use private permissions and atomic replacement.
 - Terminal results remain until acknowledgment and explicit removal.
 

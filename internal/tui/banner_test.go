@@ -53,6 +53,21 @@ func TestBannerGradientPositionMovesBetweenFrames(t *testing.T) {
 	first := gradientPosition(25, 2, 100, 0)
 	second := gradientPosition(25, 2, 100, 1)
 	require.NotEqual(t, first, second)
+
+	statusFirst := statusAgeGradientPosition(25, 100, 0)
+	statusSecond := statusAgeGradientPosition(25, 100, 1)
+	require.NotEqual(t, statusFirst, statusSecond)
+	require.NotEqual(t, first, statusFirst)
+}
+
+func TestGradientTextPreservesContentAndWidth(t *testing.T) {
+	t.Parallel()
+
+	const text = "◷ IN STATUS · 2H 5M"
+	rendered := gradientText(text, statusAgeColors(), 12)
+	require.Equal(t, lipgloss.Width(text), lipgloss.Width(rendered))
+	require.Contains(t, rendered, "◷")
+	require.Contains(t, rendered, "2")
 }
 
 func TestInterpolateHex(t *testing.T) {

@@ -32,6 +32,15 @@ version bumps).
 
 
 
+
+## [0.5.0] — 2026-07-27 — Agent: Codex
+### Added
+- Pin a live current-status timer to the far-right edge of every card's status
+  rail with an independent reverse-flow mint, coral, and rose gradient.
+### Changed
+- Move version and platform metadata to the review row so status timing remains
+  consistently glanceable without competing with the FIGlet hero.
+
 ## [0.4.0] — 2026-07-27 — Agent: Codex
 ### Added
 - Render app names with large, filled FIGlet typography, multicolor animated

@@ -99,12 +99,47 @@ func TestViewFillsTerminalAndShowsFallbacks(t *testing.T) {
 	view := model.View()
 	require.Equal(t, model.height, lipgloss.Height(view))
 	require.Contains(t, view, "WAITING FOR REVIEW")
-	require.Contains(t, view, "Status changed:")
 	require.Contains(t, view, "App Store Connect")
+	require.NotContains(t, view, "Status changed:")
 
 	model.width = 20
 	require.Contains(t, model.View(), "Terminal too small")
 	require.Equal(t, "link", hyperlink("javascript:alert(1)", "link"))
+}
+
+func TestStatusAgeUsesCurrentStatusAndSubmissionFallback(t *testing.T) {
+	t.Parallel()
+
+	now := time.Date(2026, 7, 27, 12, 0, 0, 0, time.UTC)
+	card := domain.Submission{
+		LastChangedAt: now.Add(-2*time.Hour - 5*time.Minute),
+		SubmittedAt:   now.Add(-8 * 24 * time.Hour),
+	}
+	require.Equal(t, "◷ IN STATUS · 2H 5M", statusAgeText(card, now, true))
+	require.Equal(t, "◷ 2H 5M", statusAgeText(card, now, false))
+
+	card.LastChangedAt = time.Time{}
+	require.Equal(t, "◷ IN REVIEW · 8D 0H", statusAgeText(card, now, true))
+
+	card.SubmittedAt = time.Time{}
+	require.Empty(t, statusAgeText(card, now, true))
+}
+
+func TestStatusRailKeepsAgeAtTheFarRight(t *testing.T) {
+	t.Parallel()
+
+	model := testModel(&fakeMonitor{})
+	card := model.cards[0]
+	rail := renderStatusRail(
+		card,
+		80,
+		healthPalette(card.Health),
+		12,
+		card.LastChangedAt.Add(2*time.Hour),
+	)
+	require.Equal(t, 80, lipgloss.Width(rail))
+	require.Contains(t, rail, "WAITING FOR REVIEW")
+	require.Contains(t, rail, "◷")
 }
 
 func TestLifecycleMessagesRemainNonFatal(t *testing.T) {
