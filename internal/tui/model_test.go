@@ -99,6 +99,7 @@ func TestViewFillsTerminalAndShowsFallbacks(t *testing.T) {
 	view := model.View()
 	require.Equal(t, model.height, lipgloss.Height(view))
 	require.Contains(t, view, "WAITING FOR REVIEW")
+	require.Contains(t, view, "Status changed:")
 	require.Contains(t, view, "App Store Connect")
 
 	model.width = 20
@@ -132,11 +133,27 @@ func TestLifecycleMessagesRemainNonFatal(t *testing.T) {
 	require.Contains(t, updated.notice, "open")
 
 	updated.cards[0].Acknowledged = true
+	updated.cards[0].Health = domain.HealthGray
 	updated.animating = true
 	updatedModel, command := updated.Update(animationTickMsg(time.Now()))
 	updated = updatedModel.(Model)
 	require.False(t, updated.animating)
 	require.Nil(t, command)
+}
+
+func TestWaitingCardsKeepAQuietAmbientAnimation(t *testing.T) {
+	t.Parallel()
+
+	model := testModel(&fakeMonitor{})
+	updatedModel, command := model.applyResult(monitor.Result{Cards: model.cards}, false)
+	updated := updatedModel.(Model)
+	require.True(t, updated.animating)
+	require.NotNil(t, command)
+
+	updatedModel, command = updated.Update(animationTickMsg(time.Now()))
+	updated = updatedModel.(Model)
+	require.True(t, updated.pulse)
+	require.NotNil(t, command)
 }
 
 func TestManualRefreshAndHelp(t *testing.T) {

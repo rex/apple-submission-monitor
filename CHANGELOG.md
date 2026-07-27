@@ -30,6 +30,15 @@ version bumps).
 
 
 
+
+## [0.3.4] — 2026-07-27 — Agent: Codex
+### Changed
+- Stack full-width review cards vertically and replace the block font with a
+  readable, layered gradient wordmark.
+- Render the elapsed time since each card's last meaningful status change.
+- Give waiting reviews a calm, rich blue palette with a slow ambient drift;
+  unacknowledged changes still flash until acknowledged.
+
 ## [0.3.3] — 2026-07-24 — Agent: Codex
 ### Fixed
 - Remove the unused `.env` scaffold from `make setup`, eliminating its shell

@@ -1,6 +1,8 @@
 package tui
 
 import (
+	"time"
+
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/rex/apple-submission-monitor/internal/domain"
@@ -106,4 +108,23 @@ func (m Model) hasUnacknowledged() bool {
 		}
 	}
 	return false
+}
+
+func (m Model) shouldAnimate() bool {
+	if m.hasUnacknowledged() {
+		return true
+	}
+	for _, card := range m.cards {
+		if card.Health == domain.HealthYellow {
+			return true
+		}
+	}
+	return false
+}
+
+func (m Model) nextAnimationInterval() time.Duration {
+	if m.hasUnacknowledged() {
+		return m.animationInterval
+	}
+	return max(m.animationInterval, 1600*time.Millisecond)
 }

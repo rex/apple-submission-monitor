@@ -38,3 +38,18 @@ func TestCalculateGridHandlesEmptyAndTinyInput(t *testing.T) {
 	require.Len(t, layout.rects, 1)
 	require.Equal(t, 1, layout.rects[0].width)
 }
+
+func TestCalculateGridStacksFullWidthCardsVertically(t *testing.T) {
+	t.Parallel()
+
+	layout := calculateGrid(121, 39, 3)
+	require.Equal(t, 1, layout.columns)
+	require.Equal(t, 3, layout.rows)
+	for index, area := range layout.rects {
+		require.Equal(t, 0, area.x)
+		require.Equal(t, 121, area.width)
+		if index > 0 {
+			require.Greater(t, area.y, layout.rects[index-1].y)
+		}
+	}
+}

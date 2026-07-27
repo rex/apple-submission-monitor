@@ -137,13 +137,13 @@ func (m Model) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, tea.Batch(commands...)
 	case animationTickMsg:
-		if !m.hasUnacknowledged() {
+		if !m.shouldAnimate() {
 			m.animating = false
 			m.pulse = false
 			return m, nil
 		}
 		m.pulse = !m.pulse
-		return m, animationTickCmd(m.animationInterval)
+		return m, animationTickCmd(m.nextAnimationInterval())
 	}
 	return m, nil
 }
@@ -163,9 +163,9 @@ func (m Model) applyResult(result monitor.Result, bootstrap bool) (tea.Model, te
 	if len(result.Changes) > 0 {
 		commands = append(commands, announceCmd(m.ctx, m.speaker, result.Changes))
 	}
-	if m.hasUnacknowledged() && !m.animating {
+	if m.shouldAnimate() && !m.animating {
 		m.animating = true
-		commands = append(commands, animationTickCmd(m.animationInterval))
+		commands = append(commands, animationTickCmd(m.nextAnimationInterval()))
 	}
 	return m, tea.Batch(commands...)
 }

@@ -5,7 +5,7 @@
 > and context compactions.
 >
 > Spec: `specs/initial-monitor/spec.md` · Plan: `specs/initial-monitor/plan.md`
-> Branch: `main` · Last update: 2026-07-24 by Codex
+> Branch: `main` · Last update: 2026-07-27 by Codex
 
 ## 0. TL;DR for a fresh agent session
 
@@ -79,5 +79,6 @@ Statuses: `⏸ pending` · `🟡 in-prog` · `✅ done` · `🔴 blocked`
 
 ## 6. Handoff note (fill when ending a session)
 
-Version 0.3.2 is functional, live-smoke-tested, documented, and hardened.
+Version 0.3.4 adds the vertical full-width review-ledger layout, a readable
+layered wordmark, status-age metadata, and a calm animated blue waiting state.
 Resume from a new explicit objective.

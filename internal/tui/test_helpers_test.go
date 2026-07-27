@@ -80,6 +80,7 @@ func testModel(engine Monitor) Model {
 		NextAction:    "Wait for review.",
 		ReviewURL:     "https://example.test/review",
 		SubmittedAt:   time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC),
+		LastChangedAt: time.Now().Add(-2 * time.Hour),
 		InFlight:      true,
 		Acknowledged:  true,
 	}

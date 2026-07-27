@@ -1,9 +1,5 @@
 package tui
 
-import (
-	"math"
-)
-
 const (
 	headerHeight = 3
 	footerHeight = 2
@@ -52,8 +48,8 @@ func calculateGrid(width int, height int, count int) gridLayout {
 }
 
 func (g gridLayout) cell(index int) rect {
-	column := index % g.columns
-	row := index / g.columns
+	column := 0
+	row := index
 	left := column * g.width / g.columns
 	right := (column + 1) * g.width / g.columns
 	top := headerHeight + row*g.height/g.rows
@@ -70,27 +66,6 @@ func (g gridLayout) hit(x int, y int) int {
 	return -1
 }
 
-func chooseColumns(width int, height int, count int) int {
-	bestColumns := 1
-	bestScore := math.Inf(-1)
-	for columns := 1; columns <= count; columns++ {
-		rows := (count + columns - 1) / columns
-		cellWidth := float64(width) / float64(columns)
-		cellHeight := float64(height) / float64(rows)
-		aspectPenalty := math.Abs(cellWidth/cellHeight - 2.2)
-		sizePenalty := 0.0
-		if cellWidth < 28 {
-			sizePenalty += (28 - cellWidth) / 4
-		}
-		if cellHeight < 10 {
-			sizePenalty += (10 - cellHeight) / 2
-		}
-		emptyCells := float64(columns*rows-count) * 0.2
-		score := -aspectPenalty - sizePenalty - emptyCells
-		if score > bestScore {
-			bestScore = score
-			bestColumns = columns
-		}
-	}
-	return bestColumns
+func chooseColumns(_, _, _ int) int {
+	return 1
 }

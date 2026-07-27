@@ -10,15 +10,17 @@ import (
 	"github.com/rex/apple-submission-monitor/internal/domain"
 )
 
-func TestRenderBannerIsFiveRowsAndFits(t *testing.T) {
+func TestRenderBannerUsesReadableWordmarkAndFits(t *testing.T) {
 	t.Parallel()
 
-	lines := renderBanner("Synthetic Alpha", 32, healthPalette(domain.HealthGreen))
-	require.Len(t, lines, 5)
+	lines := renderBanner("Synthetic Alpha", 32, healthPalette(domain.HealthGreen), false)
+	require.Len(t, lines, 3)
 	for _, line := range lines {
 		require.LessOrEqual(t, lipgloss.Width(line), 32)
 	}
-	require.NotEmpty(t, strings.Join(lines, ""))
+	rendered := strings.Join(lines, "")
+	require.Contains(t, rendered, "SYNTHETIC ALPHA")
+	require.NotContains(t, rendered, "███")
 }
 
 func TestInterpolateHex(t *testing.T) {

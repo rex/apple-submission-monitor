@@ -18,6 +18,8 @@ status-colored cards, and announces transitions with the macOS default voice.
 
 - Discover only apps with an active review submission.
 - Poll status through `asc status` and use `summary.health` for card colors.
+- Stack full-width review cards vertically, with a readable gradient wordmark.
+- Show the elapsed time since each card's last meaningful status change.
 - Flash changed cards until they are clicked or selected and acknowledged.
 - Announce transitions via `/usr/bin/say` without selecting a voice.
 - Retain completed submissions until acknowledgment and explicit removal.

@@ -40,7 +40,7 @@ func (m Model) renderHeader() string {
 	}
 	liveColor := "#5AF78E"
 	if m.loading {
-		liveColor = "#FFD166"
+		liveColor = "#60A5FA"
 	}
 	title := lipgloss.NewStyle().Bold(true).
 		Foreground(lipgloss.Color("#E6EDF3")).
@@ -119,9 +119,11 @@ func (m Model) renderCard(card domain.Submission, area rect, selected bool) stri
 	if !card.Acknowledged && m.pulse {
 		borderColor = "#FFFFFF"
 		background = colors.flash
+	} else if card.Health == domain.HealthYellow && m.pulse {
+		background = colors.ambient
 	}
 
-	lines := m.cardLines(card, innerWidth, innerHeight, colors)
+	lines := m.cardLines(card, innerWidth, innerHeight, colors, m.pulse)
 	body := strings.Join(lines, "\n")
 	return lipgloss.NewStyle().
 		Width(innerWidth).
@@ -138,10 +140,11 @@ func (m Model) cardLines(
 	width int,
 	height int,
 	colors palette,
+	phase bool,
 ) []string {
 	var lines []string
 	if height >= 12 && width >= 20 {
-		lines = append(lines, renderBanner(card.AppName, width, colors)...)
+		lines = append(lines, renderBanner(card.AppName, width, colors, phase)...)
 	} else {
 		lines = append(lines, lipgloss.NewStyle().
 			Bold(true).
@@ -156,6 +159,9 @@ func (m Model) cardLines(
 	version := strings.TrimSpace(card.Version + " • " + card.Platform)
 	lines = append(lines, padBetween(badge, truncate(version, width/2), width))
 	lines = append(lines, truncate("Review: "+humanState(card.ReviewState), width))
+	if !card.LastChangedAt.IsZero() {
+		lines = append(lines, truncate(statusChangedAt(card.LastChangedAt, time.Now()), width))
+	}
 
 	if !card.SubmittedAt.IsZero() {
 		lines = append(lines, truncate(

@@ -7,34 +7,22 @@ import (
 	"github.com/mattn/go-runewidth"
 )
 
-func renderBanner(name string, width int, colors palette) []string {
-	maxCharacters := max(1, (width+1)/4)
-	characters := []rune(strings.ToUpper(strings.TrimSpace(name)))
-	if len(characters) > maxCharacters {
-		characters = characters[:maxCharacters]
-		characters[len(characters)-1] = '~'
-	}
-
-	plain := make([]string, 5)
-	for _, character := range characters {
-		glyph, ok := blockFont[character]
-		if !ok {
-			glyph = blockFont['?']
-		}
-		for row := range plain {
-			if plain[row] != "" {
-				plain[row] += " "
-			}
-			plain[row] += glyph[row]
-		}
-	}
-	for row, line := range plain {
-		plain[row] = gradientLine(runewidth.Truncate(line, width, ""), colors)
-	}
-	return plain
+func renderBanner(name string, width int, colors palette, phase bool) []string {
+	wordmark := runewidth.Truncate(
+		strings.ToUpper(strings.TrimSpace(name)),
+		max(1, width-2),
+		"…",
+	)
+	face := gradientLine("◆ "+wordmark, colors, phase)
+	shadow := lipgloss.NewStyle().Foreground(lipgloss.Color(colors.shadow)).
+		Render("  " + wordmark)
+	ruleWidth := min(max(1, runewidth.StringWidth(wordmark)+1), max(1, width-2))
+	rule := lipgloss.NewStyle().Foreground(lipgloss.Color(colors.base)).
+		Render("╰" + strings.Repeat("─", ruleWidth) + "╯")
+	return []string{face, shadow, rule}
 }
 
-func gradientLine(line string, colors palette) string {
+func gradientLine(line string, colors palette, phase bool) string {
 	var rendered strings.Builder
 	characters := []rune(line)
 	for index, character := range characters {
@@ -46,6 +34,9 @@ func gradientLine(line string, colors palette) string {
 		if len(characters) > 1 {
 			position = float64(index) / float64(len(characters)-1)
 		}
+		if phase {
+			position = 1 - position
+		}
 		color := interpolateHex(colors.gradientA, colors.gradientB, position)
 		rendered.WriteString(lipgloss.NewStyle().
 			Foreground(lipgloss.Color(color)).
@@ -53,49 +44,4 @@ func gradientLine(line string, colors palette) string {
 			Render(string(character)))
 	}
 	return rendered.String()
-}
-
-var blockFont = map[rune][5]string{
-	'A': {"███", "█ █", "███", "█ █", "█ █"},
-	'B': {"██ ", "█ █", "██ ", "█ █", "██ "},
-	'C': {"███", "█  ", "█  ", "█  ", "███"},
-	'D': {"██ ", "█ █", "█ █", "█ █", "██ "},
-	'E': {"███", "█  ", "██ ", "█  ", "███"},
-	'F': {"███", "█  ", "██ ", "█  ", "█  "},
-	'G': {"███", "█  ", "█ █", "█ █", "███"},
-	'H': {"█ █", "█ █", "███", "█ █", "█ █"},
-	'I': {"███", " █ ", " █ ", " █ ", "███"},
-	'J': {"███", "  █", "  █", "█ █", "███"},
-	'K': {"█ █", "█ █", "██ ", "█ █", "█ █"},
-	'L': {"█  ", "█  ", "█  ", "█  ", "███"},
-	'M': {"█ █", "███", "███", "█ █", "█ █"},
-	'N': {"█ █", "███", "███", "███", "█ █"},
-	'O': {"███", "█ █", "█ █", "█ █", "███"},
-	'P': {"███", "█ █", "███", "█  ", "█  "},
-	'Q': {"███", "█ █", "█ █", "███", "  █"},
-	'R': {"██ ", "█ █", "██ ", "█ █", "█ █"},
-	'S': {"███", "█  ", "███", "  █", "███"},
-	'T': {"███", " █ ", " █ ", " █ ", " █ "},
-	'U': {"█ █", "█ █", "█ █", "█ █", "███"},
-	'V': {"█ █", "█ █", "█ █", "█ █", " █ "},
-	'W': {"█ █", "█ █", "███", "███", "█ █"},
-	'X': {"█ █", "█ █", " █ ", "█ █", "█ █"},
-	'Y': {"█ █", "█ █", " █ ", " █ ", " █ "},
-	'Z': {"███", "  █", " █ ", "█  ", "███"},
-	'0': {"███", "█ █", "█ █", "█ █", "███"},
-	'1': {" ██", "  █", "  █", "  █", "███"},
-	'2': {"███", "  █", "███", "█  ", "███"},
-	'3': {"███", "  █", " ██", "  █", "███"},
-	'4': {"█ █", "█ █", "███", "  █", "  █"},
-	'5': {"███", "█  ", "███", "  █", "███"},
-	'6': {"███", "█  ", "███", "█ █", "███"},
-	'7': {"███", "  █", " █ ", " █ ", " █ "},
-	'8': {"███", "█ █", "███", "█ █", "███"},
-	'9': {"███", "█ █", "███", "  █", "███"},
-	' ': {"   ", "   ", "   ", "   ", "   "},
-	'-': {"   ", "   ", "███", "   ", "   "},
-	'.': {"   ", "   ", "   ", "   ", " █ "},
-	'&': {"██ ", "█ █", " ██", "█ █", " ██"},
-	'~': {"   ", "█ █", " █ ", "   ", "   "},
-	'?': {"███", "  █", " ██", "   ", " █ "},
 }

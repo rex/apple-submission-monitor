@@ -30,6 +30,14 @@ func elapsed(value time.Time, now time.Time) string {
 	}
 }
 
+func statusChangedAt(value time.Time, now time.Time) string {
+	age := elapsed(value, now)
+	if age == "unknown" || age == "just now" {
+		return "Status changed: " + age
+	}
+	return "Status changed: " + age + " ago"
+}
+
 func truncate(value string, width int) string {
 	value = strings.ReplaceAll(value, "\n", " ")
 	value = strings.ReplaceAll(value, "\r", " ")
