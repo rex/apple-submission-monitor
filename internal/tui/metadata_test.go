@@ -22,3 +22,13 @@ func TestMetadataRailsFillWidthAndShowAppChecks(t *testing.T) {
 	require.Contains(t, rails[1], "✓ REVIEW INFO")
 	require.Contains(t, rails[1], "✓ IN FLIGHT")
 }
+
+func TestApprovedMetadataShowsOutcomeWithoutFalseInFlightFailure(t *testing.T) {
+	t.Parallel()
+
+	card := terminalCard()
+	rails := metadataRails(card, 120, approvalPalette())
+	require.Contains(t, rails[0], "APPROVED")
+	require.Contains(t, rails[1], "✓ REVIEW COMPLETE")
+	require.NotContains(t, rails[1], "✕ IN FLIGHT")
+}

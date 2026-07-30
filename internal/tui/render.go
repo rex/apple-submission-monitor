@@ -109,16 +109,23 @@ func (m Model) renderCard(card domain.Submission, area rect, selected bool) stri
 	innerWidth := max(1, area.width-2)
 	innerHeight := max(1, area.height-2)
 	colors := healthPalette(card.Health)
+	if card.Approved() {
+		colors = approvalPalette()
+	}
 	borderColor := colors.base
 	background := colors.background
 	border := lipgloss.RoundedBorder()
-	if selected {
+	if selected || card.Approved() {
 		border = lipgloss.DoubleBorder()
 		borderColor = colors.bright
 	}
 	if !card.Acknowledged && m.pulse {
 		borderColor = "#FFFFFF"
 		background = colors.flash
+	}
+	if !card.Acknowledged && card.Approved() {
+		position := float64(m.animationFrame%120) / 120
+		borderColor = gradientColor(colors.gradient, position)
 	}
 
 	lines := m.cardLines(card, innerWidth, innerHeight, colors, m.animationFrame)
@@ -148,16 +155,23 @@ func (m Model) cardLines(
 			Bold(true).
 			Foreground(lipgloss.Color(colors.bright)).
 			Render(truncate(card.AppName, max(1, width/2)))
-		age := submissionAgeText(card, time.Now())
-		lines = append(lines, padBetween(name, age, width))
+		right := submissionAgeText(card, time.Now())
+		if card.Approved() {
+			right = "APPROVED"
+		}
+		lines = append(lines, padBetween(name, right, width))
 	}
 
 	lines = append(lines, metadataRails(card, width, colors)...)
 
 	alert := ""
 	switch {
+	case !card.Acknowledged && card.Approved():
+		alert = "✦ APPROVED — APP REVIEW CLEARED — CLICK OR ENTER TO CELEBRATE ✦"
 	case !card.Acknowledged:
 		alert = "⚡ CHANGED — click or Enter to acknowledge"
+	case card.Retained && card.Approved():
+		alert = "✦ APPROVED • outcome retained • D removes this card"
 	case card.Retained:
 		alert = "Outcome retained • D removes this card"
 	}
@@ -165,10 +179,14 @@ func (m Model) cardLines(
 		for len(lines) >= height {
 			lines = lines[:len(lines)-1]
 		}
-		lines = append(lines, lipgloss.NewStyle().
-			Bold(true).
-			Foreground(lipgloss.Color(colors.bright)).
-			Render(truncate(alert, width)))
+		if card.Approved() {
+			lines = append(lines, gradientLine(truncate(alert, width), colors, frame+20))
+		} else {
+			lines = append(lines, lipgloss.NewStyle().
+				Bold(true).
+				Foreground(lipgloss.Color(colors.bright)).
+				Render(truncate(alert, width)))
+		}
 	}
 	if len(lines) > height {
 		lines = lines[:height]

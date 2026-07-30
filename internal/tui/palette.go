@@ -57,6 +57,14 @@ func healthPalette(health domain.Health) palette {
 	}
 }
 
+func approvalPalette() palette {
+	return palette{
+		base: "#00F5A0", bright: "#FFF3A3", background: "#02140D",
+		flash: "#0A5136", shadow: "#07503A",
+		gradient: []string{"#00F5A0", "#37D5FF", "#C7FF4A", "#FFD166", "#00F5A0"},
+	}
+}
+
 func interpolateHex(start string, end string, position float64) string {
 	var startR, startG, startB int
 	var endR, endG, endB int

@@ -54,7 +54,7 @@ func metadataRails(
 		buildCheck(card),
 		booleanCheck("NO BLOCKERS", card.BlockersKnown, card.BlockerCount == 0),
 		booleanCheck("REVIEW INFO", card.ReviewKnown, card.ReviewDetails),
-		booleanCheck("IN FLIGHT", true, card.InFlight),
+		reviewProgressCheck(card),
 	})
 
 	submitted := "SUBMITTED UNKNOWN"
@@ -136,6 +136,13 @@ func booleanCheck(label string, known bool, passed bool) metadataItem {
 	default:
 		return metadataItem{text: "✕ " + label, color: "#FF6B81"}
 	}
+}
+
+func reviewProgressCheck(card domain.Submission) metadataItem {
+	if card.Approved() {
+		return metadataItem{text: "✓ REVIEW COMPLETE", color: "#5AF78E"}
+	}
+	return booleanCheck("IN FLIGHT", true, card.InFlight)
 }
 
 func buildCheck(card domain.Submission) metadataItem {

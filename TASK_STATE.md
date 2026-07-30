@@ -5,7 +5,7 @@
 > and context compactions.
 >
 > Spec: `specs/initial-monitor/spec.md` · Plan: `specs/initial-monitor/plan.md`
-> Branch: `main` · Last update: 2026-07-27 by Codex
+> Branch: `main` · Last update: 2026-07-30 by Codex
 
 ## 0. TL;DR for a fresh agent session
 
@@ -70,6 +70,10 @@ Statuses: `⏸ pending` · `🟡 in-prog` · `✅ done` · `🔴 blocked`
 
 ## 4. Recent decisions (append-only, newest first)
 
+- 2026-07-30 — Continue refreshing retained cards and resolve completed review
+  outcomes through `asc review status` plus `asc review history`.
+- 2026-07-30 — Treat approved as a dedicated giant victory state and transition
+  identity as the user-visible outcome, not transport metadata.
 - 2026-07-24 — Use Go, Bubble Tea, and Lip Gloss (project owner).
 - 2026-07-24 — Poll with asc only; persist runtime state outside the repo.
 
@@ -79,8 +83,8 @@ Statuses: `⏸ pending` · `🟡 in-prog` · `✅ done` · `🔴 blocked`
 
 ## 6. Handoff note (fill when ending a session)
 
-Version 0.6.0 pairs every app-name hero with an equally large total submission
-age in a shared FIGlet font. Age art is green through 48 hours, gold until 120
-hours, then deteriorated and blood-red. Three bold metadata rails show App ID
-plus ASC-derived build, blocker, review-detail, and in-flight checks; diagnostic
-refreshes never trigger false transition alerts. Resume from a new objective.
+Version 0.6.1 fixes the review-complete handoff: retained cards continue polling,
+completed reviews settle through ASC review status/history, and user-visible
+outcomes prevent duplicate-label announcements. Approved cards become an
+animated emerald/cyan/lime/gold victory state with a giant `APPROVED` hero and
+the configurable approved speech template. Resume from a new objective.

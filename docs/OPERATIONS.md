@@ -32,6 +32,9 @@ footer. Both files and their directory use private permissions.
   border/background flash used only by unacknowledged changes.
 - Submission age is calculated from Apple's submitted date. It remains green
   through 48 hours, gold until 120 hours, and blood-red at 120 hours and beyond.
+- Retained cards continue polling until manual removal. When App Review becomes
+  complete, the monitor resolves the final version state and derived outcome
+  through `asc review status` and `asc review history`.
 
 Tune the values in the generated YAML:
 
@@ -48,9 +51,9 @@ frequently than polling, and worker count must remain between 1 and 16.
 
 ## Status changes
 
-A transition occurs when health, review state, App Store state, next action, or
-the in-flight flag changes. App names, versions, links, and other metadata may
-refresh without generating duplicate alerts.
+A transition occurs when the user-visible review status or terminal outcome
+changes. Health, transport flags, next actions, links, and other metadata may
+refresh without generating misleading same-label announcements.
 
 For each transition the app:
 
@@ -62,7 +65,8 @@ For each transition the app:
 
 Click the card or press `Enter` to acknowledge it. Approved, rejected, and
 otherwise terminal cards remain persisted even after `asc` stops listing them.
-After acknowledgment, press `D` to remove one.
+Approved outcomes replace the waiting-time hero with a giant animated
+`APPROVED` victory treatment. After acknowledgment, press `D` to remove one.
 
 ## Degraded operation
 

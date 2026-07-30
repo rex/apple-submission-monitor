@@ -34,6 +34,7 @@ func TestAnnounceUsesDefaultVoice(t *testing.T) {
 	after.Health = domain.HealthGreen
 	after.ReviewState = "COMPLETE"
 	after.AppStoreState = "READY_FOR_DISTRIBUTION"
+	after.Outcome = "APPROVED"
 	after.InFlight = false
 
 	require.NoError(t, speaker.Announce(context.Background(), before, after))

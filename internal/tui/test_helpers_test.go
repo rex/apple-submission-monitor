@@ -112,6 +112,7 @@ func terminalCard() domain.Submission {
 		Health:        domain.HealthGreen,
 		ReviewState:   "COMPLETE",
 		AppStoreState: "READY_FOR_DISTRIBUTION",
+		Outcome:       "APPROVED",
 		ReviewURL:     "https://example.test/review",
 		Acknowledged:  true,
 		Retained:      true,

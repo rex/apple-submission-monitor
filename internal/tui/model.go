@@ -58,12 +58,14 @@ type Model struct {
 }
 
 type bannerSpec struct {
-	name      string
-	health    domain.Health
-	width     int
-	maxHeight int
-	ageText   string
-	ageBand   submissionAgeBand
+	name        string
+	health      domain.Health
+	width       int
+	maxHeight   int
+	rightText   string
+	rightBloody bool
+	ageBand     submissionAgeBand
+	approved    bool
 }
 
 type cachedBanner struct {
@@ -207,13 +209,23 @@ func (m *Model) rebuildBannerCache() {
 			continue
 		}
 		age := submissionAge(card, now)
+		ageBand := classifySubmissionAge(age)
+		rightText := submissionAgeText(card, now)
+		rightBloody := ageBand == ageBandRed
+		approved := card.Approved()
+		if approved {
+			rightText = "APPROVED"
+			rightBloody = false
+		}
 		spec := bannerSpec{
-			name:      card.AppName,
-			health:    card.Health,
-			width:     width,
-			maxHeight: max(1, height-4),
-			ageText:   submissionAgeText(card, now),
-			ageBand:   classifySubmissionAge(age),
+			name:        card.AppName,
+			health:      card.Health,
+			width:       width,
+			maxHeight:   max(1, height-4),
+			rightText:   rightText,
+			rightBloody: rightBloody,
+			ageBand:     ageBand,
+			approved:    approved,
 		}
 		if cached, ok := m.bannerCache[card.Key()]; ok && cached.spec == spec {
 			next[card.Key()] = cached
@@ -223,11 +235,11 @@ func (m *Model) rebuildBannerCache() {
 			spec: spec,
 			art: prepareHero(
 				spec.name,
-				spec.ageText,
+				spec.rightText,
 				spec.width,
 				spec.maxHeight,
 				spec.health == domain.HealthRed,
-				spec.ageBand,
+				spec.rightBloody,
 			),
 		}
 	}

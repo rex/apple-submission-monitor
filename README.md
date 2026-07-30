@@ -27,7 +27,11 @@ status-colored cards, and announces transitions with the macOS default voice.
   and explicit build/blocker/review checks across three bold metadata rails.
 - Flash changed cards until they are clicked or selected and acknowledged.
 - Announce transitions via `/usr/bin/say` without selecting a voice.
-- Retain completed submissions until acknowledgment and explicit removal.
+- Resolve completed reviews through `asc review status` and `asc review history`,
+  then turn approved cards into an animated emerald, cyan, lime, and gold
+  victory state with a giant `APPROVED` hero.
+- Keep retained outcomes authoritative until explicit removal, even after active
+  review discovery stops listing them.
 - Store editable announcement templates and runtime state outside the repo.
 
 ## Quick start
@@ -78,7 +82,7 @@ field.
 
 ```yaml
 announcements:
-  approved: "Great news. {{.AppName}} has been approved."
+  approved: "Great news. {{.AppName}} has been approved by App Review. You did it. Congratulations!"
   rejected: "Attention. {{.AppName}} was rejected. Its status is {{.NewStatus}}."
   status_changed: "{{.AppName}} changed from {{.OldStatus}} to {{.NewStatus}}."
 ```
@@ -106,10 +110,13 @@ asc CLI → monitor engine → persisted snapshot → Bubble Tea dashboard
 
 - Full discovery runs less frequently than active-card polling, uses a bounded
   worker pool, and enriches cards with submitted-build and review-detail checks.
-- Status changes compare a stable fingerprint, preventing metadata-only flashes.
+- Retained cards continue lightweight status polling; terminal snapshots use
+  review status/history to settle the final version state and outcome.
+- Status changes compare the user-visible outcome, preventing metadata-only
+  updates and duplicate-label announcements.
 - Prepared dual-hero FIGlet masks are cached; animation recolors the app name
-  and submission age without rebuilding fonts or strobing an acknowledged
-  card's background.
+  and right-hand age/outcome hero without rebuilding fonts or strobing an
+  acknowledged card's background.
 - State writes use private permissions and atomic replacement.
 - Terminal results remain until acknowledgment and explicit removal.
 

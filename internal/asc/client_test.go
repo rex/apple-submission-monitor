@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/rex/apple-submission-monitor/internal/domain"
 )
 
 type fakeRunner struct {
@@ -101,6 +103,77 @@ func TestRefreshPreservesDiscoveryDiagnostics(t *testing.T) {
 	require.True(t, refreshed[0].BuildValid())
 	require.True(t, refreshed[0].ReviewKnown)
 	require.True(t, refreshed[0].ReviewDetails)
+}
+
+func TestRefreshSettlesRetainedReviewIntoApprovedOutcome(t *testing.T) {
+	t.Parallel()
+
+	var calls []string
+	runner := runnerFunc(func(_ context.Context, args ...string) ([]byte, error) {
+		joined := strings.Join(args, " ")
+		calls = append(calls, joined)
+		switch {
+		case strings.HasPrefix(joined, "status --app app-alpha"):
+			return []byte(`{
+				"app":{"id":"app-alpha"},
+				"summary":{"health":"green","nextAction":"Review release status.","blockers":[]},
+				"appstore":null,
+				"submission":{"inFlight":false,"blockingIssues":[]},
+				"review":{"latestSubmissionId":"review-alpha","platform":"IOS","state":"COMPLETE","submittedDate":"2026-01-02T03:04:05Z"},
+				"links":{"appStoreConnect":"https://example.test/apps/alpha"}
+			}`), nil
+		case strings.HasPrefix(joined, "review status --app app-alpha"):
+			return []byte(`{
+				"version":{"id":"version-alpha","version":"1.2.3","platform":"IOS","state":"READY_FOR_DISTRIBUTION"},
+				"reviewDetailConfigured":true,
+				"latestSubmission":{"id":"review-alpha","state":"COMPLETE","platform":"IOS","submittedDate":"2026-01-02T03:04:05Z"},
+				"reviewState":"COMPLETE",
+				"nextAction":"Review the completed App Review outcome."
+			}`), nil
+		case strings.HasPrefix(joined, "review history --app app-alpha"):
+			return []byte(`[{
+				"submissionId":"review-alpha",
+				"versionString":"1.2.3",
+				"platform":"IOS",
+				"state":"COMPLETE",
+				"submittedDate":"2026-01-02T03:04:05Z",
+				"outcome":"approved"
+			}]`), nil
+		default:
+			return nil, errors.New("unexpected synthetic command")
+		}
+	})
+	client := NewClient(runner, 1)
+	previous := domain.Submission{
+		ID:            "review-alpha",
+		AppID:         "app-alpha",
+		AppName:       "Synthetic Alpha",
+		BundleID:      "test.example.alpha",
+		Platform:      "IOS",
+		Version:       "1.2.3",
+		VersionID:     "version-alpha",
+		Health:        domain.HealthYellow,
+		ReviewState:   "COMPLETE",
+		AppStoreState: "IN_REVIEW",
+		InFlight:      false,
+		BuildKnown:    true,
+		BuildState:    "VALID",
+		Acknowledged:  true,
+		Retained:      true,
+	}
+
+	refreshed, err := client.Refresh(context.Background(), []domain.Submission{previous})
+	require.NoError(t, err)
+	require.Len(t, refreshed, 1)
+	card := refreshed[0]
+	require.Equal(t, domain.HealthGreen, card.Health)
+	require.Equal(t, "APPROVED", card.Outcome)
+	require.Equal(t, "Approved", card.StatusLabel())
+	require.Equal(t, "READY_FOR_DISTRIBUTION", card.AppStoreState)
+	require.Equal(t, "Synthetic Alpha", card.AppName)
+	require.Equal(t, "1.2.3", card.Version)
+	require.True(t, card.BuildValid())
+	require.Contains(t, strings.Join(calls, "\n"), "review history --app app-alpha")
 }
 
 type runnerFunc func(context.Context, ...string) ([]byte, error)

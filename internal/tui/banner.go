@@ -48,25 +48,38 @@ func (m Model) renderCardBanner(
 		cached.spec.name == card.AppName &&
 		cached.spec.health == card.Health &&
 		cached.spec.width == width &&
-		cached.spec.maxHeight == maxHeight {
+		cached.spec.maxHeight == maxHeight &&
+		cached.spec.approved == card.Approved() {
+		rightColors := submissionAgePalette(cached.spec.ageBand)
+		if cached.spec.approved {
+			rightColors = approvalPalette()
+		}
 		return cached.art.render(
 			width,
 			colors,
-			submissionAgePalette(cached.spec.ageBand),
+			rightColors,
 			frame,
 		)
 	}
 	now := time.Now()
 	age := submissionAge(card, now)
 	ageBand := classifySubmissionAge(age)
+	rightText := submissionAgeText(card, now)
+	rightBloody := ageBand == ageBandRed
+	rightColors := submissionAgePalette(ageBand)
+	if card.Approved() {
+		rightText = "APPROVED"
+		rightBloody = false
+		rightColors = approvalPalette()
+	}
 	return prepareHero(
 		card.AppName,
-		submissionAgeText(card, now),
+		rightText,
 		width,
 		maxHeight,
 		card.Health == domain.HealthRed,
-		ageBand,
-	).render(width, colors, submissionAgePalette(ageBand), frame)
+		rightBloody,
+	).render(width, colors, rightColors, frame)
 }
 
 func colorizeFigure(
@@ -132,7 +145,20 @@ func newGradientGlyphs(colors palette) gradientGlyphs {
 }
 
 func gradientLine(line string, colors palette, frame uint64) string {
-	return colorizeFigure([]string{line}, max(1, runewidth.StringWidth(line)), colors, frame, true)[0]
+	width := max(1, runewidth.StringWidth(line))
+	var rendered strings.Builder
+	for column, character := range []rune(line) {
+		if character == ' ' {
+			rendered.WriteRune(character)
+			continue
+		}
+		position := gradientPosition(column, 0, width, frame)
+		rendered.WriteString(lipgloss.NewStyle().
+			Foreground(lipgloss.Color(gradientColor(colors.gradient, position))).
+			Bold(true).
+			Render(string(character)))
+	}
+	return rendered.String()
 }
 
 func gradientPosition(column int, row int, width int, frame uint64) float64 {

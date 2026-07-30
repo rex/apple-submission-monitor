@@ -32,12 +32,17 @@ review submissions. All remote data comes from the installed `asc` CLI.
   to five days, and deteriorated blood-red at five days or later.
 - The system shall show App ID and trustworthy build, blocker, review-detail,
   and in-flight checks retrieved through `asc`.
+- The system shall keep retained cards polling until explicit removal and use
+  `asc review status` plus `asc review history` to resolve completed outcomes.
 
 ### Events
 
 - When a status changes, the system shall persist the transition, speak the
   configured announcement with `/usr/bin/say` and no voice flag, and animate
   the card until acknowledgment.
+- When App Review reports an approved outcome, the system shall display
+  `APPROVED` as the authoritative status and render a dedicated animated
+  green/cyan/lime/gold victory treatment.
 - When an animated card is clicked or selected and acknowledged, the system
   shall stop its alert flashing and retain its stable health color while
   ambient hero gradients continue.
@@ -57,7 +62,8 @@ review submissions. All remote data comes from the installed `asc` CLI.
 
 - If no submissions are active, the system shall render a helpful empty state.
 - If an approved or otherwise terminal submission disappears from `asc`, the
-  system shall retain it until acknowledgment and explicit removal.
+  active-submission list, the system shall continue resolving its known card,
+  retain the outcome until acknowledgment, and require explicit removal.
 - If speech is unavailable, the system shall continue monitoring and show a
   non-fatal warning.
 

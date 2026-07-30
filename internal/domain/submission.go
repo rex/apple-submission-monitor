@@ -37,6 +37,7 @@ type Submission struct {
 	Health        Health    `json:"health"`
 	ReviewState   string    `json:"review_state"`
 	AppStoreState string    `json:"app_store_state"`
+	Outcome       string    `json:"outcome,omitempty"`
 	NextAction    string    `json:"next_action"`
 	AppStoreURL   string    `json:"app_store_url"`
 	ReviewURL     string    `json:"review_url"`
@@ -67,11 +68,8 @@ func (s Submission) Key() string {
 // Fingerprint returns fields whose change should alert the user.
 func (s Submission) Fingerprint() string {
 	return strings.Join([]string{
-		string(s.Health),
-		s.ReviewState,
-		s.AppStoreState,
-		s.NextAction,
-		fmt.Sprintf("%t", s.InFlight),
+		s.StatusLabel(),
+		fmt.Sprintf("%t", s.Terminal()),
 	}, "\x1f")
 }
 
@@ -82,6 +80,15 @@ func (s Submission) BuildValid() bool {
 
 // StatusLabel returns the most useful concise status for display and speech.
 func (s Submission) StatusLabel() string {
+	if s.Outcome != "" {
+		return humanizeState(s.Outcome)
+	}
+	switch strings.ToUpper(s.ReviewState) {
+	case "COMPLETE":
+		return "Review Complete"
+	case "UNRESOLVED_ISSUES":
+		return "Issues Found"
+	}
 	if s.AppStoreState != "" {
 		return humanizeState(s.AppStoreState)
 	}
@@ -91,8 +98,17 @@ func (s Submission) StatusLabel() string {
 	return "Unknown"
 }
 
+// Approved reports whether asc review history confirmed a successful outcome.
+func (s Submission) Approved() bool {
+	outcome := strings.ToUpper(strings.TrimSpace(s.Outcome))
+	return outcome == "APPROVED" || outcome == "ACCEPTED"
+}
+
 // Terminal reports whether the submission has reached an outcome.
 func (s Submission) Terminal() bool {
+	if s.Outcome != "" {
+		return true
+	}
 	if s.ReviewState == "COMPLETE" ||
 		s.ReviewState == "UNRESOLVED_ISSUES" ||
 		!s.InFlight && s.Health == HealthGreen {

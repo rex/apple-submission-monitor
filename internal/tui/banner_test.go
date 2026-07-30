@@ -74,7 +74,7 @@ func BenchmarkRenderPreparedBanner(b *testing.B) {
 func BenchmarkRenderPreparedHero(b *testing.B) {
 	nameColors := healthPalette(domain.HealthYellow)
 	ageColors := submissionAgePalette(ageBandRed)
-	art := prepareHero("Synthetic Alpha", "8D 17H", 156, 18, false, ageBandRed)
+	art := prepareHero("Synthetic Alpha", "8D 17H", 156, 18, false, true)
 	b.ResetTimer()
 	for b.Loop() {
 		art.render(156, nameColors, ageColors, 12)

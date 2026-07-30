@@ -7,16 +7,16 @@
 - **Active branch**: `main`
 - **Active feature spec**: `specs/initial-monitor/`
 - **Active TASK_STATE**: `TASK_STATE.md` (Phase 4 complete)
-- **Last session**: 2026-07-27 (Codex, dual giant hero and ASC check rails)
+- **Last session**: 2026-07-30 (Codex, retained-outcome repair and approval victory)
 
 ## Last three decisions
 
-- 2026-07-27 Use cached filled FIGlet banners with animated multicolor
-  gradients and a blood-dripping red-health treatment.
 - 2026-07-27 Use total submission age as a same-scale right-hand FIGlet hero,
   with green, gold, and bleeding-red urgency bands.
-- 2026-07-27 Enrich wide metadata rails with App ID and truthful ASC checks only
-  during full discovery.
+- 2026-07-30 Continue polling retained cards and settle completed outcomes
+  through ASC review status/history.
+- 2026-07-30 Render approved outcomes as a giant animated victory state and
+  suppress transport-only duplicate-label announcements.
 
 ## Open blockers
 

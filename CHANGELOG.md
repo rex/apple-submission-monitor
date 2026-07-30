@@ -34,6 +34,24 @@ version bumps).
 
 
 
+
+## [0.6.1] — 2026-07-30 — Agent: Codex
+### Added
+- Resolve completed retained cards through `asc review status` and
+  `asc review history`, preserving their authoritative final outcome even after
+  active submission discovery stops listing them.
+- Render approved outcomes with a giant `APPROVED` hero, animated
+  emerald/cyan/lime/gold gradients, a prismatic border, and a dedicated
+  celebration message.
+### Changed
+- Keep retained cards polling until explicit removal and preserve stable card
+  metadata when the aggregate status response omits completed version details.
+- Base transition alerts on the user-visible status so transport-only changes
+  cannot announce misleading same-label transitions.
+- Speak the configurable approved announcement for confirmed approved outcomes
+  and show review completion as a successful check instead of a false
+  `IN FLIGHT` failure.
+
 ## [0.6.0] — 2026-07-27 — Agent: Codex
 ### Added
 - Pair each app-name hero with an equally large, right-aligned total submission

@@ -92,6 +92,27 @@ func TestApplyResultAnimatesAndAnnouncesChanges(t *testing.T) {
 	require.Equal(t, 1, speaker.count)
 }
 
+func TestApprovedOutcomeBecomesGiantVictoryState(t *testing.T) {
+	t.Parallel()
+
+	model := testModel(&fakeMonitor{})
+	approved := terminalCard()
+	approved.AppID = "app-alpha"
+	approved.AppName = "Synthetic Alpha"
+	approved.Acknowledged = false
+	model.cards = []domain.Submission{approved}
+	model.width = 180
+	model.height = 30
+	model.rebuildBannerCache()
+
+	cached := model.bannerCache[approved.Key()]
+	require.True(t, cached.spec.approved)
+	require.Equal(t, "APPROVED", cached.spec.rightText)
+	require.NotEmpty(t, cached.art.right.figure)
+	require.Contains(t, model.View(), "APP REVIEW CLEARED")
+	require.Contains(t, model.View(), "✓ REVIEW COMPLETE")
+}
+
 func TestViewFillsTerminalAndShowsFallbacks(t *testing.T) {
 	t.Parallel()
 

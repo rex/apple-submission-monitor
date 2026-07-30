@@ -68,6 +68,30 @@ type statusResponse struct {
 
 type reviewStatusResponse struct {
 	ReviewDetailConfigured bool `json:"reviewDetailConfigured"`
+	Version                struct {
+		ID          string `json:"id"`
+		Version     string `json:"version"`
+		Platform    string `json:"platform"`
+		State       string `json:"state"`
+		CreatedDate string `json:"createdDate"`
+	} `json:"version"`
+	LatestSubmission struct {
+		ID            string `json:"id"`
+		State         string `json:"state"`
+		Platform      string `json:"platform"`
+		SubmittedDate string `json:"submittedDate"`
+	} `json:"latestSubmission"`
+	ReviewState string `json:"reviewState"`
+	NextAction  string `json:"nextAction"`
+}
+
+type reviewHistoryResponse []struct {
+	SubmissionID string `json:"submissionId"`
+	Version      string `json:"versionString"`
+	Platform     string `json:"platform"`
+	State        string `json:"state"`
+	Outcome      string `json:"outcome"`
+	SubmittedAt  string `json:"submittedDate"`
 }
 
 type versionViewResponse struct {

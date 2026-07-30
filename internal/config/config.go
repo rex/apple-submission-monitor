@@ -165,7 +165,7 @@ asc_path: asc
 say_path: /usr/bin/say
 open_path: /usr/bin/open
 announcements:
-  approved: "Great news. {{.AppName}} has been approved."
+  approved: "Great news. {{.AppName}} has been approved by App Review. You did it. Congratulations!"
   rejected: "Attention. {{.AppName}} was rejected. Its status is {{.NewStatus}}."
   status_changed: "{{.AppName}} changed from {{.OldStatus}} to {{.NewStatus}}."
 `

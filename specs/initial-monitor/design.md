@@ -9,6 +9,8 @@ asc apps list
       │                               │ active app IDs
       ▼                               ▼
 persisted cards <── transition engine <── asc status
+      ▲                                      │ completed review
+      └──── asc review status/history <──────┘
       │                    │
       │                    └─> announcement template ─> /usr/bin/say
       ▼
@@ -32,13 +34,15 @@ Bubble Tea model ──> equal-cell grid ──> terminal
 ## Status identity and transitions
 
 A card is keyed by review-submission ID, not app ID, so consecutive submissions
-for the same app do not overwrite history. A transition fingerprint contains the
-review state, App Store state, health, next action, and in-flight flag. Metadata
-refreshes that do not change the fingerprint do not flash or speak.
+for the same app do not overwrite history. A transition fingerprint contains
+the authoritative user-visible status and terminal identity. Transport flags,
+next actions, health-only updates, and other metadata do not produce
+same-label announcements.
 
-Persisted cards are removed automatically only when they were never observed as
-terminal. Once a monitored card becomes terminal, it remains until the user
-acknowledges it and invokes removal.
+Persisted cards continue polling after active discovery drops them. Completed
+reviews are enriched from review status/history until an outcome is known. Once
+a monitored card becomes terminal, it remains until the user acknowledges it
+and invokes removal.
 
 ## Security and privacy
 
@@ -51,6 +55,7 @@ acknowledges it and invokes removal.
 ## Performance
 
 Active polls default to 30 seconds. Full app discovery defaults to five minutes.
-Discovery workers are capped at four; submitted-build and review-detail checks
-run only during discovery. A shared 400 ms animation tick recolors cached hero
-masks, while only unacknowledged cards flash their border and background.
+Discovery workers are capped at four; submitted-build checks run only during
+discovery, while known terminal cards use bounded review status/history calls.
+A shared 400 ms animation tick recolors cached hero masks, while only
+unacknowledged cards flash their border and background.

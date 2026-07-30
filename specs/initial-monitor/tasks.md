@@ -9,6 +9,7 @@
 - [x] S2.1 Implement typed `asc` discovery and status retrieval.
 - [x] S2.2 Implement configuration, persistence, transitions, and speech.
 - [x] S2.3 Add synthetic unit and fake-binary integration coverage.
+- [x] S2.4 Resolve retained terminal outcomes and suppress same-label events.
 
 ## Phase 3
 
@@ -16,6 +17,7 @@
 - [x] S3.1a Add same-scale submission-age art and horizontal metadata checks.
 - [x] S3.2 Add mouse and keyboard acknowledgment, removal, links, and refresh.
 - [x] S3.3 Verify resize, degraded, empty, and terminal-retention behavior.
+- [x] S3.4 Celebrate approved outcomes with a dedicated giant victory hero.
 
 ## Phase 4
 

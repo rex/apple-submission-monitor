@@ -11,6 +11,8 @@
 - [x] Discover apps, filter active submissions, and poll `asc status`.
 - [x] Persist cards atomically outside the repository.
 - [x] Detect transitions, retain terminal cards, and render announcement templates.
+- [x] Settle retained terminal cards through review status/history without
+  duplicate-label announcements.
 
 ## Phase 3 — Terminal experience
 
@@ -18,6 +20,7 @@
 - [x] Pair app names with same-scale, age-classified submission-time heroes.
 - [x] Distribute App ID and ASC-derived health checks across wide metadata rails.
 - [x] Use health colors for borders, badges, and animation.
+- [x] Render approved outcomes as a giant animated victory state.
 - [x] Support mouse acknowledgment plus keyboard navigation, links, refresh, and removal.
 - [x] Surface polling freshness, shortcuts, and sanitized degraded states.
 

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/rex/apple-submission-monitor/internal/domain"
 )
@@ -16,6 +17,11 @@ func (c *Client) enrichDiagnostics(
 	var errs []error
 	if err := c.reviewDiagnostics(ctx, card); err != nil {
 		errs = append(errs, err)
+	}
+	if card.Terminal() {
+		if err := c.reviewOutcome(ctx, card); err != nil {
+			errs = append(errs, err)
+		}
 	}
 	if err := c.buildDiagnostics(ctx, card); err != nil {
 		errs = append(errs, err)
@@ -48,6 +54,56 @@ func (c *Client) reviewDiagnostics(
 	}
 	card.ReviewKnown = true
 	card.ReviewDetails = response.ReviewDetailConfigured
+	card.VersionID = firstNonEmpty(response.Version.ID, card.VersionID)
+	card.Version = firstNonEmpty(response.Version.Version, card.Version)
+	card.Platform = firstNonEmpty(response.Version.Platform, response.LatestSubmission.Platform, card.Platform)
+	card.AppStoreState = firstNonEmpty(response.Version.State, card.AppStoreState)
+	card.ReviewState = firstNonEmpty(response.ReviewState, response.LatestSubmission.State, card.ReviewState)
+	card.NextAction = firstNonEmpty(response.NextAction, card.NextAction)
+	card.ID = firstNonEmpty(response.LatestSubmission.ID, card.ID)
+	if submitted := parseTime(response.LatestSubmission.SubmittedDate); !submitted.IsZero() {
+		card.SubmittedAt = submitted
+	}
+	if created := parseTime(response.Version.CreatedDate); !created.IsZero() {
+		card.CreatedAt = created
+	}
+	return nil
+}
+
+func (c *Client) reviewOutcome(
+	ctx context.Context,
+	card *domain.Submission,
+) error {
+	if card.Version == "" {
+		return nil
+	}
+	args := []string{
+		"review", "history",
+		"--app", card.AppID,
+		"--version", card.Version,
+		"--paginate",
+		"--output", "json",
+	}
+	if card.Platform != "" {
+		args = append(args, "--platform", card.Platform)
+	}
+	output, err := c.runner.Run(ctx, args...)
+	if err != nil {
+		return err
+	}
+	var response reviewHistoryResponse
+	if err := json.Unmarshal(output, &response); err != nil {
+		return fmt.Errorf("decode asc review history: %w", err)
+	}
+	for _, entry := range response {
+		if card.ID != "" && entry.SubmissionID != "" && entry.SubmissionID != card.ID {
+			continue
+		}
+		if outcome := strings.TrimSpace(entry.Outcome); outcome != "" {
+			card.Outcome = strings.ToUpper(outcome)
+			return nil
+		}
+	}
 	return nil
 }
 

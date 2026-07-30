@@ -61,10 +61,15 @@ func (c *Client) Refresh(
 			defer group.Done()
 			for card := range jobs {
 				current, err := c.status(ctx, card.AppID, card.Platform, card.ID)
-				current.BuildState = card.BuildState
-				current.BuildKnown = card.BuildKnown
-				current.ReviewDetails = card.ReviewDetails
-				current.ReviewKnown = card.ReviewKnown
+				if err == nil {
+					current = mergeRefreshFields(current, card)
+					if current.Terminal() {
+						err = errors.Join(
+							c.reviewDiagnostics(ctx, &current),
+							c.reviewOutcome(ctx, &current),
+						)
+					}
+				}
 				results <- refreshResult{card: current, err: err}
 			}
 		}()
@@ -80,6 +85,8 @@ func (c *Client) Refresh(
 	for result := range results {
 		if result.err != nil {
 			errs = append(errs, result.err)
+		}
+		if result.card.ID == "" && result.card.AppID == "" {
 			continue
 		}
 		refreshed = append(refreshed, result.card)
@@ -106,15 +113,41 @@ func sendCards(
 ) {
 	defer close(jobs)
 	for _, card := range cards {
-		if card.Retained && card.Terminal() {
-			continue
-		}
 		select {
 		case jobs <- card:
 		case <-ctx.Done():
 			return
 		}
 	}
+}
+
+func mergeRefreshFields(
+	current domain.Submission,
+	previous domain.Submission,
+) domain.Submission {
+	current.ID = firstNonEmpty(current.ID, previous.ID)
+	current.AppID = firstNonEmpty(current.AppID, previous.AppID)
+	current.AppName = firstNonEmpty(current.AppName, previous.AppName)
+	current.BundleID = firstNonEmpty(current.BundleID, previous.BundleID)
+	current.Platform = firstNonEmpty(current.Platform, previous.Platform)
+	current.Version = firstNonEmpty(current.Version, previous.Version)
+	current.VersionID = firstNonEmpty(current.VersionID, previous.VersionID)
+	current.AppStoreState = firstNonEmpty(current.AppStoreState, previous.AppStoreState)
+	current.Outcome = firstNonEmpty(current.Outcome, previous.Outcome)
+	current.AppStoreURL = firstNonEmpty(current.AppStoreURL, previous.AppStoreURL)
+	current.ReviewURL = firstNonEmpty(current.ReviewURL, previous.ReviewURL)
+	current.TestFlightURL = firstNonEmpty(current.TestFlightURL, previous.TestFlightURL)
+	if current.SubmittedAt.IsZero() {
+		current.SubmittedAt = previous.SubmittedAt
+	}
+	if current.CreatedAt.IsZero() {
+		current.CreatedAt = previous.CreatedAt
+	}
+	current.BuildState = previous.BuildState
+	current.BuildKnown = previous.BuildKnown
+	current.ReviewDetails = previous.ReviewDetails
+	current.ReviewKnown = previous.ReviewKnown
+	return current
 }
 
 func sortCards(cards []domain.Submission) {

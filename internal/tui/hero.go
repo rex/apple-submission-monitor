@@ -10,61 +10,61 @@ import (
 const heroGap = 3
 
 type heroArt struct {
-	name      bannerArt
-	age       bannerArt
-	nameWidth int
-	ageWidth  int
-	font      string
+	name       bannerArt
+	right      bannerArt
+	nameWidth  int
+	rightWidth int
+	font       string
 }
 
 func prepareHero(
 	name string,
-	ageText string,
+	rightText string,
 	width int,
 	maxHeight int,
 	nameRejected bool,
-	ageBand submissionAgeBand,
+	rightBloody bool,
 ) heroArt {
 	for _, candidate := range candidateFonts(nameRejected) {
 		nameFigure := renderFigure(name, candidate.name)
-		ageFigure := renderFigure(ageText, candidate.name)
-		if len(nameFigure) == 0 || len(ageFigure) == 0 {
+		rightFigure := renderFigure(rightText, candidate.name)
+		if len(nameFigure) == 0 || len(rightFigure) == 0 {
 			continue
 		}
 		nameArt := styleFigure(nameFigure, name, candidate.bloody)
-		ageArt := styleFigure(ageFigure, ageText, ageBand == ageBandRed)
+		rightArt := styleFigure(rightFigure, rightText, rightBloody)
 		nameWidth := figureWidth(nameArt.figure)
-		ageWidth := figureWidth(ageArt.figure)
-		if nameWidth+heroGap+ageWidth > width ||
-			max(len(nameArt.figure), len(ageArt.figure)) > maxHeight {
+		rightWidth := figureWidth(rightArt.figure)
+		if nameWidth+heroGap+rightWidth > width ||
+			max(len(nameArt.figure), len(rightArt.figure)) > maxHeight {
 			continue
 		}
 		return heroArt{
-			name: nameArt, age: ageArt,
-			nameWidth: nameWidth, ageWidth: ageWidth,
+			name: nameArt, right: rightArt,
+			nameWidth: nameWidth, rightWidth: rightWidth,
 			font: candidate.name,
 		}
 	}
 
 	nameFallback := truncate(strings.ToUpper(strings.TrimSpace(name)), max(1, width/2))
-	ageFallback := truncate(ageText, max(1, width/3))
+	rightFallback := truncate(rightText, max(1, width/3))
 	return heroArt{
-		name:      bannerArt{fallback: nameFallback},
-		age:       bannerArt{fallback: ageFallback},
-		nameWidth: runewidth.StringWidth(nameFallback),
-		ageWidth:  runewidth.StringWidth(ageFallback),
+		name:       bannerArt{fallback: nameFallback},
+		right:      bannerArt{fallback: rightFallback},
+		nameWidth:  runewidth.StringWidth(nameFallback),
+		rightWidth: runewidth.StringWidth(rightFallback),
 	}
 }
 
 func (art heroArt) render(
 	width int,
 	nameColors palette,
-	ageColors palette,
+	rightColors palette,
 	frame uint64,
 ) []string {
 	nameLines := art.name.render(max(1, art.nameWidth), nameColors, frame)
-	ageLines := art.age.render(max(1, art.ageWidth), ageColors, frame+40)
-	height := max(len(nameLines), len(ageLines))
+	rightLines := art.right.render(max(1, art.rightWidth), rightColors, frame+40)
+	height := max(len(nameLines), len(rightLines))
 	lines := make([]string, height)
 	for row := range height {
 		left := ""
@@ -72,8 +72,8 @@ func (art heroArt) render(
 			left = nameLines[row]
 		}
 		right := ""
-		if row < len(ageLines) {
-			right = ageLines[row]
+		if row < len(rightLines) {
+			right = rightLines[row]
 		}
 		lines[row] = padBetween(left, right, width)
 		if lipgloss.Width(lines[row]) > width {

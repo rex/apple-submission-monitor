@@ -59,6 +59,7 @@ func TestEngineLifecycle(t *testing.T) {
 	approved.Health = domain.HealthGreen
 	approved.ReviewState = "COMPLETE"
 	approved.AppStoreState = "READY_FOR_DISTRIBUTION"
+	approved.Outcome = "APPROVED"
 	approved.InFlight = false
 	source.refreshed = []domain.Submission{approved}
 	source.discovered = nil

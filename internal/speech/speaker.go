@@ -95,7 +95,8 @@ func (s *Speaker) Announce(
 }
 
 func announcementName(card domain.Submission) string {
-	if card.Health == domain.HealthGreen && card.Terminal() {
+	if card.Approved() ||
+		card.Health == domain.HealthGreen && card.Terminal() {
 		return "approved"
 	}
 	if card.Health == domain.HealthRed ||

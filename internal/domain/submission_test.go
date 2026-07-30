@@ -29,7 +29,17 @@ func TestSubmissionStatusAndTerminal(t *testing.T) {
 				Health:      domain.HealthGreen,
 				ReviewState: "COMPLETE",
 			},
-			label:    "Complete",
+			label:    "Review Complete",
+			terminal: true,
+		},
+		"approved": {
+			card: domain.Submission{
+				Health:        domain.HealthGreen,
+				ReviewState:   "COMPLETE",
+				AppStoreState: "READY_FOR_DISTRIBUTION",
+				Outcome:       "APPROVED",
+			},
+			label:    "Approved",
 			terminal: true,
 		},
 		"rejected": {
@@ -49,6 +59,13 @@ func TestSubmissionStatusAndTerminal(t *testing.T) {
 			require.Equal(t, test.terminal, test.card.Terminal())
 		})
 	}
+}
+
+func TestApprovedRecognizesReviewOutcome(t *testing.T) {
+	t.Parallel()
+
+	require.True(t, (domain.Submission{Outcome: "approved"}).Approved())
+	require.False(t, (domain.Submission{Outcome: "rejected"}).Approved())
 }
 
 func TestNormalizeHealth(t *testing.T) {
@@ -83,6 +100,8 @@ func TestFingerprintIgnoresMetadataRefresh(t *testing.T) {
 	after.BlockersKnown = true
 	after.ReviewKnown = true
 	after.ReviewDetails = true
+	after.Health = domain.HealthBlue
+	after.InFlight = false
 
 	require.Equal(t, before.Fingerprint(), after.Fingerprint())
 }
