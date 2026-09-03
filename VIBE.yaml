@@ -38,13 +38,15 @@ project:
       date: "2026-07-24"
       decided_by: project-owner
       summary: Use Go with Bubble Tea and Lip Gloss
-      rationale: A native binary provides a responsive and durable long-running TUI.
+      rationale: A native binary provides a responsive and durable long-running 
+        TUI.
       status: locked
     - id: D2
       date: "2026-07-24"
       decided_by: project-owner
       summary: Keep the application local-only and public-safe
-      rationale: Runtime data stays outside the repository and all remote reads use asc.
+      rationale: Runtime data stays outside the repository and all remote reads 
+        use asc.
       status: locked
 
 workflow:
@@ -64,7 +66,8 @@ workflow:
   signed_commits_required: true
   push_after_each_commit_if_remote_exists: true
   validation_command: make validate
-  final_verification_command: make check-if-the-agent-can-consider-this-task-completed
+  final_verification_command: make 
+    check-if-the-agent-can-consider-this-task-completed
   # Set false for repos that already have a Dockerfile and are
   # actively iterating on it.
   ask_before_dockerizing: true
@@ -161,11 +164,11 @@ deployment:
   dockerized: false
   autodeploy:
     enabled: false
-    system: null
-    app_slug: null
+    system:
+    app_slug:
     stack_required: false
-    stack_repo_local_path: null
-    stack_path: null
+    stack_repo_local_path:
+    stack_path:
     runtime_changes_require_stack_update: false
     require_commit_push_deploy_after_stack_change: false
 
@@ -180,3 +183,8 @@ go:
     version: "v2"
   build_target: ""
   cgo_enabled: false
+skills:
+  - id: agentic-skeleton
+    version: "0.47.0"
+    applied: '2026-09-03'
+    source: sync

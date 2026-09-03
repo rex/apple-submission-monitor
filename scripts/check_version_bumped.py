@@ -1,4 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# ///
 """check_version_bumped.py — gate that blocks commits without a version bump.
 
 Wired into:
@@ -8,9 +11,8 @@ Wired into:
 
 Rules enforced:
   1. VERSION file exists and contains a semver string.
-  2. VERSION differs from HEAD's VERSION when work is pending (unless HEAD
-     doesn't exist — bootstrap exemption for the first commit). A clean,
-     already-committed tree validates the current release instead.
+  2. VERSION differs from HEAD's VERSION (unless HEAD doesn't exist —
+     bootstrap exemption for the first commit).
   3. CHANGELOG.md has a `## [<NEW_VERSION>] — ` header matching the
      current VERSION.
 
@@ -43,44 +45,58 @@ def fail(msg: str, code: int) -> None:
     sys.exit(code)
 
 
-def head_version() -> str | None:
-    """Return HEAD's VERSION contents, or None if no HEAD or no VERSION at HEAD."""
+def _git_show_version(ref: str) -> str | None:
+    """Return VERSION contents at the given git ref, or None if ref/file missing."""
+    show = subprocess.run(
+        ["git", "show", f"{ref}:VERSION"],
+        capture_output=True, text=True, check=False,
+    )
+    if show.returncode != 0:
+        return None
+    return show.stdout.strip()
+
+
+def _git_repo_ok() -> bool:
     try:
         result = subprocess.run(
             ["git", "rev-parse", "--git-dir"],
             capture_output=True, check=False,
         )
-        if result.returncode != 0:
-            return None  # not in a git repo
+        return result.returncode == 0
     except FileNotFoundError:
-        return None  # git not available
+        return False
 
-    # Bootstrap exemption: no HEAD yet
+
+def head_version() -> str | None:
+    """Return HEAD's VERSION (pre-commit comparison: working-tree vs HEAD)."""
+    if not _git_repo_ok():
+        return None
     head_check = subprocess.run(
         ["git", "rev-parse", "HEAD"],
         capture_output=True, check=False,
     )
     if head_check.returncode != 0:
+        return None  # bootstrap exemption: no HEAD yet
+    return _git_show_version("HEAD")
+
+
+def parent_version() -> str | None:
+    """Return HEAD~1's VERSION (post-commit / CI comparison: HEAD vs parent).
+
+    In CI the checkout puts working-tree IN SYNC with HEAD — comparing
+    them always says "unchanged". The right comparison there is HEAD vs
+    HEAD~1. Bootstrap exemption: parent doesn't exist on the very first
+    commit.
+    """
+    if not _git_repo_ok():
         return None
-
-    show = subprocess.run(
-        ["git", "show", "HEAD:VERSION"],
-        capture_output=True, text=True, check=False,
+    parent_check = subprocess.run(
+        ["git", "rev-parse", "HEAD~1"],
+        capture_output=True, check=False,
     )
-    if show.returncode != 0:
-        return None  # VERSION didn't exist at HEAD
-    return show.stdout.strip()
-
-
-def working_tree_has_changes() -> bool:
-    """Return whether non-ignored repository content differs from HEAD."""
-    result = subprocess.run(
-        ["git", "status", "--porcelain"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    return result.returncode == 0 and bool(result.stdout.strip())
+    if parent_check.returncode != 0:
+        return None  # bootstrap exemption: only one commit so far
+    return _git_show_version("HEAD~1")
 
 
 def main() -> int:
@@ -92,8 +108,13 @@ def main() -> int:
     if not SEMVER_RE.match(current):
         fail(f"VERSION is not semver: '{current}'", 3)
 
-    prev = head_version()
-    if prev is not None and prev == current and working_tree_has_changes():
+    # In CI, the checkout puts working-tree IN SYNC with HEAD, so comparing
+    # them always says "unchanged" and the gate trips on every release.
+    # Compare HEAD vs HEAD~1 instead when CI=true (GitHub Actions / Gitea
+    # Actions / most CI runners set this automatically).
+    in_ci = os.environ.get("CI", "").lower() == "true"
+    prev = parent_version() if in_ci else head_version()
+    if prev is not None and prev == current:
         fail(
             f"VERSION unchanged ({current}). Bump before committing.\n"
             "    Run: make bump-patch | bump-minor | bump-major",

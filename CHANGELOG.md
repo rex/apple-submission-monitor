@@ -35,6 +35,10 @@ version bumps).
 
 
 
+## [0.7.0] — 2026-09-03 — Agent: Claude
+### Changed
+- synced to agentic-skeleton 0.47.0 (path-scoped rules); Serena removed (rules, hooks, .mcp.json, .serena/)
+
 ## [0.6.1] — 2026-07-30 — Agent: Codex
 ### Added
 - Resolve completed retained cards through `asc review status` and

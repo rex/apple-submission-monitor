@@ -25,7 +25,7 @@ SLICE_ID="${1:-unknown}"
 COMMIT_TYPE="${2:-chore}"
 BUMP_LEVEL="${3:-}"
 
-cd "${CLAUDE_PROJECT_DIR:-.}"
+cd "${CLAUDE_PROJECT_DIR:-.}" || exit 1
 
 # --- Precondition: bump level required (unless this is the bootstrap commit) ---
 if [ -z "$BUMP_LEVEL" ]; then

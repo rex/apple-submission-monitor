@@ -5,6 +5,19 @@
 # Fires on: PreToolUse (matcher: Bash)
 # Reads:    JSON tool_input from stdin
 # Exits:    0 allow · 2 block (message to stderr) · JSON for ask-confirm
+#
+# Known false-positive: heredoc commit messages
+#   `git commit -m "$(cat <<EOF ... rm -rf / ... EOF)"` is blocked because
+#   the matched pattern (e.g. `rm -rf /`) appears in the command line, even
+#   though it's the heredoc body, not a command being run. The hook can't
+#   parse bash to distinguish quoted-string-in-heredoc from invocation.
+#   Workaround: write the message to a temp file and use `git commit -F`:
+#     cat > /tmp/commit-msg <<'EOF'
+#     <message body, including any blocked-pattern strings>
+#     EOF
+#     git commit -S -F /tmp/commit-msg && rm /tmp/commit-msg
+#   `-F <file>` puts only the file path on the command line; the body
+#   never reaches the hook's regex.
 
 set -uo pipefail
 
