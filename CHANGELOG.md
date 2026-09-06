@@ -35,6 +35,15 @@ version bumps).
 
 
 
+## [0.8.0] — 2026-09-06 — Agent: Claude Sonnet 5 (fleet wave 2)
+### Changed
+- Synced skeleton to agentic-skeleton 0.48.0 (check_architecture.py, check_module_rules.py refreshed; VIBE.yaml stamped with skills provenance).
+- Reconciled `.claude/settings.json` against the current greenfield template, dropping the stale `PreCompact` hook entry pointing at an already-deleted `pre-compact.sh`.
+### Fixed
+- Added `# pragma: allowlist secret` to VIBE.yaml's `secrets_in_files: forbidden` line per skeleton convention, preventing a detect-secrets false positive.
+### Removed
+- Confirmed Serena is fully purged (no `.serena/`, no Serena rules/hooks, no `.mcp.json` entry) — nothing left to remove from this repo.
+
 ## [0.7.0] — 2026-09-03 — Agent: Claude
 ### Changed
 - synced to agentic-skeleton 0.47.0 (path-scoped rules); Serena removed (rules, hooks, .mcp.json, .serena/)
